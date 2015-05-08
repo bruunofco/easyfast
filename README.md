@@ -37,8 +37,11 @@ The EasyFast PHP framework is open-sourced software licensed under the [Apache 2
 ## About
 **Author**: Bruno Oliveira <bruno@salluzweb.com.br>
 **Contributors**: 
+
 > James Miranda <jameswpm@gmail.com>
+
 > Hiago Souza <hiago@sparkweb.com.br>
+
 > Mauro Fileto <mfileto@netcaster.us>
 
 #### Soon a fast start
