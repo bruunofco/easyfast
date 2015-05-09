@@ -1,0 +1,11 @@
+$conn = new Connection();
+$conn->beginTransaction();
+$conn->table('usuarios');
+$conn->col('name');
+$conn->orderBy('nome', 'desc');
+$conn->orderBy('email', 'desc');
+$conn->limit(5);
+$conn->join('este', 'este.user', '=', 'usuarios.user');
+$conn->leftJoin('este2', 'este.user', '=', 'usuarios.user');
+$conn->where('name', 'Armando');
+$conn->select();

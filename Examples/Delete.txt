@@ -1,0 +1,1 @@
+$conn = Connection::Table('usuarios')->where('id', 11)->delete();

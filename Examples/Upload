@@ -1,0 +1,3 @@
+$upload = new EasyFast\Common\Upload($_FILES['fileUpload']);
+$upload->resizeImg('300px', '200px');
+$upload->save('Uploads');

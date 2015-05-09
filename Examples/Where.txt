@@ -1,0 +1,14 @@
+$conn = new Connection();
+$conn->table('usuarios');
+$conn->where('name', 'Brunaldo');
+$conn->where('idade', '>=', '22', Connection::_AND);
+$conn->orWhere(function($query) {
+    $query->where('sexo', '=', 'Masculino', Connection::_OR);
+    $query->where('tel', '=', '17992228899');
+});
+$conn->orWhere(function($query) {
+    $query->where('sexo', '=', 'Masculino');
+    $query->where('tel', '=', '17992228899');
+});
+$conn->where('sexo', '=', 'Masculino', Connection::_OR);
+echo $conn->getWhere();

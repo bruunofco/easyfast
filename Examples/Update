@@ -1,0 +1,6 @@
+$conn = new Connection();
+$conn->beginTransaction();
+$conn->table('usuarios');
+$conn->where('name', 'Armando');
+$conn->update(array('name' => 'Bernardo Campos', 'senha' => 1234, 'status' => true));
+$conn->commit();
