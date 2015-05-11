@@ -1,8 +1,8 @@
 # EasyFast PHP Framework
 
-EasyFast PHP is a framework for working with php. With a simple and elegant syntax.
+EasyFast PHP is a framework that makes PHP programming fast and easy, using a simple and elegant syntax.
 
-EasyFast PHP is focused on taking all the headache of working with object orientation. Behind a simple interface however robust to work with ORM (Object-relational mapping), it has an incredible tool for generating classes and many other features like:
+EasyFast PHP is focused on taking away all the headache of working with object orientation. Behind a simple, but robust,   interface to work with ORM (Object-relational mapping), you will find an incredible tool to generate classes, along with  other features such as:
 
 ## Features
 - RESTful server
@@ -23,16 +23,16 @@ EasyFast PHP is focused on taking all the headache of working with object orient
 - ORM
 - Design Patterns
 
-EasyFast PHP has many other features.
+Try EasyFast PHP and share your experience. We love feedback!
 
 ## Documentation
 We are still developing the documentation, help us!
 
 ## Contributing
-Still in development, we asked collaboration to do a successful product, made this passionate language that is the easiest and powerful PHP.
+Still under development, we are accepting collaboration in order to create a successful tool, created on top of this passionate language PHP.
 
 ## License
-The EasyFast PHP framework is open-sourced software licensed under the [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0)
+The EasyFast PHP framework is an open-sourced software licensed under the [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0)
 
 ## About
 **Author**: Bruno Oliveira <bruno@salluzweb.com.br>
