@@ -36,10 +36,10 @@ class App
     /**
      * Constantes do framework
      */
-    CONST VERSION    = '1.1';
+    CONST VERSION    = '1.0';
     CONST NAME_FW    = 'EasyFast';
     CONST NAME_SPACE = 'EasyFast';
-    CONST SITE       = 'www.riosoft.com.br';
+    CONST SITE       = 'https://github.com/bruunofco/easyfast/';
     CONST AUTHOR     = 'Bruno Oliveira';
 
     /**
