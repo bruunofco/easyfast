@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 namespace EasyFast;
 
 include __DIR__ . '/Config/Config.class.php';
