@@ -26,9 +26,10 @@ use EasyFast\Exceptions\EasyFastException;
 
 /**
  * Class App
- * Provê métodos utils para a aplicação
+ * main framework class, contain utils methods for application
  * @author Bruno Oliveira <bruno@salluzweb.com.br>
- * @package EasyFast\Class
+ * @package EasyFast
+ * @access public
  */
 class App
 {
