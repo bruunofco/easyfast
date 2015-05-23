@@ -198,12 +198,18 @@ trait Utils
 
     /**
      * Method decodeResquest
-     * Decodifica requisição e transforma em objeto
+     * Decodes request and turns into object or string
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
-     * @return object
+     * @param bool $getString Return string or object
+     * @access public
+     * @return mixed
      */
-    public static function decodeRequest ()
+    public static function decodeRequest ($getString = false)
     {
+        if ($getString) {
+            return file_get_contents("php://input");
+        }
+
         $data = json_decode(file_get_contents("php://input"));
         if (json_last_error() == JSON_ERROR_NONE) {
             return $data;
