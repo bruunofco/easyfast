@@ -64,7 +64,9 @@ class Connection
         $configs = App::getDBConfig();
 
         if (is_null($db)) {
-            $this->open($configs['Main']);
+            $dataBaseMain = App::dbMain();
+            $dataBaseMain = !is_null($dataBaseMain) ? $dataBaseMain : 'Main';
+            $this->open($configs[$dataBaseMain]);
         } elseif (is_array($db)) {
             $this->open($db);
         } else {
