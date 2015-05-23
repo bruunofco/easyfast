@@ -79,9 +79,9 @@ class MXML extends DOMDocument
         $this->preserveWhiteSpace = false;
         parent::load($xml, $option);
 		parent::xinclude();
-//        if (!parent::validate()) {
-//            throw new EasyFastException('Invalid XML File.');
-//        }
+        if (!parent::validate()) {
+            throw new EasyFastException('Invalid XML File.');
+        }
     }
 
     /**
@@ -95,10 +95,9 @@ class MXML extends DOMDocument
      */
     public function loadXML ($xml, $option = null)
     {
-        if (is_string($xml) && preg_match('/^[<]/', $xml)) {
-            $this->preserveWhiteSpace = false;
-            parent::loadXML($xml, $option);
-        } else {
+        $this->preserveWhiteSpace = false;
+        parent::loadXML($xml, $option);
+        if (parent::validate()) {
             throw new EasyFastException('Invalid XML.');
         }
 
