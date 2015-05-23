@@ -230,15 +230,15 @@ abstract class Model
      */
     public function toArray ()
     {
-        if (empty($this->result)) {
+        if (empty(self::$result)) {
             return get_object_vars($this);
         } else {
-            if (is_object($this->result)) {
-                $array = get_object_vars($this->result);
+            if (is_object(self::$result)) {
+                $array = get_object_vars(self::$result);
                 return $array;
-            } elseif (is_array($this->result)) {
+            } elseif (is_array(self::$result)) {
                 $array = array();
-                foreach ($this->result as $r) {
+                foreach (self::$result as $r) {
                     $array[] = get_object_vars($r);
                 }
                 return $array;
