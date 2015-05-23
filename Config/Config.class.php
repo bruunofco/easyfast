@@ -51,6 +51,12 @@ trait Config
     private static $dbConfigs;
 
     /**
+     * @var string $dbMain
+     * @access private
+     */
+    private static $dbMain;
+
+    /**
      * @var bool $routeDynamic
      * @access protected
      * Se for true irá instanciar método de rota dinamica automaticamente
@@ -247,5 +253,21 @@ trait Config
     public function sessionAutoStart ($bool)
     {
         $this->sessionAutoStart = $bool;
+    }
+
+    /**
+     * Method dbMain
+     * informs or get the main application database
+     * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     * @access public
+     * @return mixed
+     */
+    public static function dbMain ($db = null)
+    {
+        if (is_null($db)) {
+            return self::$dbMain;
+        } else {
+            self::$dbMain = $db;
+        }
     }
 }
