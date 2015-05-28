@@ -17,6 +17,8 @@
 
 namespace EasyFast\Mvc;
 
+use EasyFast\App;
+
 /**
  * Abstract Class Controller
  * Classe Abstrata responsável pelo Controller
@@ -25,6 +27,19 @@ namespace EasyFast\Mvc;
  */
 abstract class Controller
 {
-    // TODO: checar funcionalidades para controller
+
+    /**
+     * Method addRestfulServer
+     * Add restful server
+     * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     * @param string $method
+     * @param string $url
+     * @param string $methodClass
+     */
+    protected function addRestfulServer ($method, $url, $methodClass)
+    {
+        App::getServerRestful()->server($method, $url, array($this, $methodClass));
+    }
+
 
 }
