@@ -234,7 +234,7 @@ trait Utils
         $refle      = new ReflectionMethod($class, $method);
 
         if (count($refle->getParameters()) && !count((array) $args)) {
-            throw new EasyFastException('É necessário passar parâmetros para este método.');
+            throw new EasyFastException('It is mandatory to pass parameters.');
         }
 
         foreach ($refle->getParameters() as $arg) {
@@ -243,10 +243,15 @@ trait Utils
             } elseif ($arg->isDefaultValueAvailable()) {
                 $arguments[$arg->name] = $arg->getDefaultValue();
             } else {
-                throw new EasyFastException("É necessário passar parâmetros para este método ({$arg->name} é um parâmetro obrigatório).");
+                throw new EasyFastException("It is mandatory to pass parameters, {$arg->name} is a parameter mandatory.");
             }
         }
-        
-        call_user_func_array(array(new $class, $method), $arguments);
+
+        if (!is_object($class)) {
+            $class = new $class;
+        }
+
+        call_user_func_array(array($class, $method), $arguments);
+        die;
     }
 }
