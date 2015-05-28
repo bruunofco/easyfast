@@ -30,6 +30,11 @@ use EasyFast\Exceptions\EasyFastException;
 class Restful
 {
     /**
+     * @var array Store querystring
+     */
+    private $queryString;
+
+    /**
      * Method __construct
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      */
@@ -55,7 +60,7 @@ class Restful
         $method = strtoupper($method);
         try {
 
-            if (is_array($this->checkUrl($url)) && ($_SERVER['REQUEST_METHOD'] == $method && is_callable($callback))) {
+            if ($this->checkUrl($url) && ($_SERVER['REQUEST_METHOD'] == $method && is_callable($callback))) {
 
                 if (is_array($callback) && $argsAssoc) {
                     $data = Utils::decodeRequest();
@@ -64,25 +69,25 @@ class Restful
                         $data = new StdClass();
                     }
                     
-                    foreach ($this->checkUrl($url) as $key => $val) {
+                    foreach ($this->queryString as $key => $val) {
                         $data->$key = $val;
                     }
 
                     Utils::callMethodArgsOrder($callback[0], $callback[1], (array) $data);
                 } elseif (is_array($callback)) {                             
-                    call_user_func_array(array(new $callback[0], $callback[1]), $this->checkUrl($url));
+                    call_user_func_array(array(new $callback[0], $callback[1]), $this->queryString);
                 } else {
-                    call_user_func_array($callback, $this->checkUrl($url));
+                    call_user_func_array($callback, $this->queryString);
                 }
 
                 exit();
             }
 
-            return false;
-
         } catch (EasyFastException $e) {
-            $this->response($e->getMessage(), 412);
+            $this->response('status => error | message => '. $e->getMessage(), 412);
         }
+
+        //return false;
     }
 
 
@@ -125,7 +130,7 @@ class Restful
     {
         $url = array_filter(explode('/', $url));
         $queryString = array_filter(explode('/', isset($_GET['url']) ? $_GET['url'] : null));
-        $vars = array();
+        $this->queryString = array();
 
         if (count($url) != count($queryString)) {
             return false;
@@ -134,18 +139,18 @@ class Restful
         foreach ($url as $key => $val) {
             if (preg_match('/^:/', $val)) {
                 $newKey = str_replace(':', '', $val);
-                $vars[$newKey] = $queryString[$key];
+                $this->queryString[$newKey] = $queryString[$key];
             } elseif ($queryString[$key] != $val) {
                 return false;
             }
         }
 
-        return $vars;
+        return true;
     }
 
     /**
      * Method response
-     * Retorna resposta em json e HTTP Status
+     * Return response in json, HTTP Status and exit system
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
      * @return string
@@ -157,6 +162,7 @@ class Restful
         }
 
         echo Utils::jsonEncode($response);
+        exit();
     }
 
 }
