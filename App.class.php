@@ -79,8 +79,7 @@ class App
         if ($this->sessionAutoStart) {
             new Session();
         }
-        //Instancia classe Registry
-        static::$registry = Registry::getInstance();
+
         //Instancia rota dinâmica
         if ($this->routeDynamic) {
             $this->route();
@@ -129,43 +128,31 @@ class App
         if (!isset($_GET['url'])) {
             $index = isset(self::$route['index']) ? self::$route['index'] : null;
             $this->routeLocation($index);
+            exit();
         }
 
         $queryStrings = array_filter(explode('/', $_GET['url']));
-        try {
-            if (count($queryStrings) == 1) {
-                $nameClass = 'Controller\\'.ucfirst(Utils::hiphenToCamelCase($queryStrings[0]));
-                if (class_exists($nameClass)) {
-                    $class = new $nameClass;
-                    if (method_exists($class, 'View')) {
-                        $class->view();
-                    } else {
-                        throw new EasyFastException('Erro ao gerar visualização.');
-                    }
-                } else {
-                    throw new EasyFastException("Classe \"$nameClass\" inexistente ou inválida.");
-                }
-            } elseif (count($queryStrings) >= 2) {
-                $nameClass = 'Controller\\'.ucfirst(Utils::hiphenToCamelCase($queryStrings[0]));
+        $nameClass = 'Controller\\' . ucfirst(Utils::hiphenToCamelCase($queryStrings[0]));
 
-                if (class_exists($nameClass)) {
-                    $class = new $nameClass;
+        if (!class_exists($nameClass)) {
+            throw new EasyFastException("Class \"$nameClass\" not found.");
+        }
 
-                    if (!self::$restful) {
-                        $nameMethod = Utils::hiphenToCamelCase($queryStrings[1]);
-                        if (method_exists($class, $nameMethod)) {
-                            $class->$nameMethod();
-                        } else {
-                            throw new EasyFastException('Método inexistente ou inválido.');
-                        }
-                    }
+        $class = new $nameClass;
 
-                } else {
-                    throw new EasyFastException("Classe \"$nameClass\" inexistente ou inválida.");
-                }
+        if (count($queryStrings) > 1) {
+            $nameMethod = Utils::hiphenToCamelCase($queryStrings[1]);
+            if (method_exists($class, $nameMethod)) {
+                $class->$nameMethod();
+            } else {
+                throw new EasyFastException("Method \"$nameMethod\" not found.");
             }
-        } catch (EasyFastException $e) {
-            echo $e->getMessage();
+        } else {
+            if (method_exists($class, 'view')) {
+                $class->view();
+            } else {
+                throw new EasyFastException('Error generating display.');
+            }
         }
 
     }
