@@ -18,15 +18,17 @@
 namespace EasyFast;
 
 include __DIR__ . '/Config/Config.class.php';
+include __DIR__ . '/Http/Restful.class.php';
 
 use EasyFast\Common\Utils;
+use EasyFast\Http\Restful;
 use EasyFast\Common\Registry;
 use EasyFast\Sessions\Session;
 use EasyFast\Exceptions\EasyFastException;
 
 /**
  * Class App
- * main framework class, contain utils methods for application
+ * Main framework class, contain utils methods for application
  * @author Bruno Oliveira <bruno@salluzweb.com.br>
  * @package EasyFast
  * @access public
@@ -52,6 +54,11 @@ class App
      * @var array $route Armagena as configurações de rota
      */
     private static $route = array();
+
+    /**
+     * @var bool Accept restful
+     */
+    private static $restful;
 
     /**
      * Trait Config
@@ -108,8 +115,6 @@ class App
                 require_once self::$appDir . "{$fileName}.class.php";
             } elseif (file_exists(strtolower(self::$appDir . "{$fileName}.class.php"))) {
                 require_once strtolower(self::$appDir . "{$fileName}.class.php");
-            } else {
-                //throw new EasyFastException("Classe $fileName inexistente.");
             }
         }
     }
@@ -121,42 +126,48 @@ class App
      */
     private function route ()
     {
-        if (isset($_GET['url'])) {
-            $queryStrings = array_filter(explode('/', $_GET['url']));
-            try {
-                if (count($queryStrings) == 1) {
-                    $nameClass = 'Controller\\'.ucfirst(Utils::hiphenToCamelCase($queryStrings[0]));
-                    if (class_exists($nameClass)) {
-                        $class = new $nameClass;
-                        if (method_exists($class, 'View')) {
-                            $class->view();
-                        } else {
-                            throw new EasyFastException('Erro ao gerar visualização.');
-                        }
+        if (!isset($_GET['url'])) {
+            $index = isset(self::$route['index']) ? self::$route['index'] : null;
+            $this->routeLocation($index);
+        }
+
+        $queryStrings = array_filter(explode('/', $_GET['url']));
+        try {
+            if (count($queryStrings) == 1) {
+                $nameClass = 'Controller\\'.ucfirst(Utils::hiphenToCamelCase($queryStrings[0]));
+                if (class_exists($nameClass)) {
+                    $class = new $nameClass;
+                    if (method_exists($class, 'View')) {
+                        $class->view();
                     } else {
-                        throw new EasyFastException("Classe \"$nameClass\" inexistente ou inválida.");
+                        throw new EasyFastException('Erro ao gerar visualização.');
                     }
-                } elseif (count($queryStrings) >= 2) {
-                    $nameClass = 'Controller\\'.ucfirst(Utils::hiphenToCamelCase($queryStrings[0]));
-                    $nameMethod = Utils::hiphenToCamelCase($queryStrings[1]);
-                    if (class_exists($nameClass)) {
-                        $class = new $nameClass;
+                } else {
+                    throw new EasyFastException("Classe \"$nameClass\" inexistente ou inválida.");
+                }
+            } elseif (count($queryStrings) >= 2) {
+                $nameClass = 'Controller\\'.ucfirst(Utils::hiphenToCamelCase($queryStrings[0]));
+
+                if (class_exists($nameClass)) {
+                    $class = new $nameClass;
+
+                    if (!self::$restful) {
+                        $nameMethod = Utils::hiphenToCamelCase($queryStrings[1]);
                         if (method_exists($class, $nameMethod)) {
                             $class->$nameMethod();
                         } else {
                             throw new EasyFastException('Método inexistente ou inválido.');
                         }
-                    } else {
-                        throw new EasyFastException("Classe \"$nameClass\" inexistente ou inválida.");
                     }
+
+                } else {
+                    throw new EasyFastException("Classe \"$nameClass\" inexistente ou inválida.");
                 }
-            } catch (EasyFastException $e) {
-                echo $e->getMessage();
             }
-        } else {
-            $index = isset(self::$route['index']) ? self::$route['index'] : null;
-            $this->routeLocation($index);
+        } catch (EasyFastException $e) {
+            echo $e->getMessage();
         }
+
     }
 
     /**
@@ -181,6 +192,33 @@ class App
     public static function routeIndex ($url)
     {
         self::$route['index'] = $url;
+    }
+
+    /**
+     * Method acceptServerRestful
+     * Enable accept server restful
+     * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     */
+    public function acceptServerRestful ()
+    {
+        self::$restful = new Restful();
+    }
+
+    /**
+     * Method getServerRestful
+     * Get instance Restful
+     * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     * @throws EasyFastException
+     * @return Restful
+     */
+    public static function getServerRestful ()
+    {
+        if (!self::$restful instanceof Restful) {
+            Restful::response(array('status' => 'error', 'message' => 'Server Restful disabled.'), 403);
+            exit();
+        }
+
+        return self::$restful;
     }
 
 }
