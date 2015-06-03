@@ -418,8 +418,6 @@ abstract class Model
         }
 
         $conn->update($varsDB);
-        
-        echo $conn->getQuery();
         $conn->cleanQuery();
     }
 
