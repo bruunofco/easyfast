@@ -35,6 +35,7 @@ class EasyFastException extends Exception
      */
     public function __construct ($msg, $code = 0)
     {
+        $code = is_int($code) ? $code : null;
         parent::__construct($msg, $code);
     }
 }
