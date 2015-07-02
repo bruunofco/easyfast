@@ -53,7 +53,7 @@ trait Utils
                 }
                 return json_encode($arr);
             } else {
-                return json_encode($val);    
+                return json_encode($val);
             }
             
         } elseif (is_array($val) && is_array($key)) {
@@ -64,7 +64,7 @@ trait Utils
             $string = substr($string, -1);
             return json_encode(array($string));
         } elseif (is_object($val)) {
-            return json_encode((array) $val);
+            return json_encode($val);
         } elseif (!is_null($key)) {
             return json_encode(array($key => $val));
         } else {
@@ -72,12 +72,21 @@ trait Utils
             $array = Array();
             foreach ($val as $value) {
                 $value = explode('=>', $value);
+
                 if (array_key_exists(1, $value)) {
-                    $array[trim($value[0])] = trim($value[1]);
+//                    if (is_array($value[1])) {
+//                        foreach ($value[1] as $k => $v) {
+//                            $array[trim($k)] = trim($v);
+//                        }
+//                    } else {
+                        $array[trim($value[0])] = trim($value[1]);
+//                    }
+
                 } else {
                     array_push($array, $value[0]);
                 }
             }
+
             return json_encode($array);
         }
     }
@@ -253,5 +262,31 @@ trait Utils
 
         call_user_func_array(array($class, $method), $arguments);
         die;
+    }
+
+    /**
+     * Method mask
+     * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     * @param $val
+     * @param $mask
+     * @return string
+     */
+    public static function mask ($val, $mask)
+    {
+        $maskared = '';
+        $k = 0;
+        for ($i = 0; $i <= strlen($mask)-1; $i++) {
+            if($mask[$i] == '#') {
+                if (isset($val[$k])) {
+                    $maskared .= $val[$k++];
+                }
+            } else {
+                if (isset($mask[$i])) {
+                    $maskared .= $mask[$i];
+                }
+            }
+        }
+
+        return $maskared;
     }
 }
