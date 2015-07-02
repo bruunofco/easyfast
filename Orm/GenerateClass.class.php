@@ -114,12 +114,12 @@ trait GenerateClass
     }
 
     /**
-     * Method setXml
+     * Method setSchema
      * Seta XML contendo o schema do banco de dados
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @param string $xml
      */
-    public function setXml ($xml)
+    public function setSchema ($xml)
     {
         $this->schema = new MXML();
         $this->schema->loadXML($xml);
@@ -371,7 +371,7 @@ trait GenerateClass
     private function structureClass ()
     {
         $v  = "<?php";
-        $v .= "\n/** Generation by EasyFast Framework **/";
+        $v .= "\n/** Generation by EasyFast Framework - " . date('Y-m-d H:i:s') . "**/";
         $v .= "\nnamespace {$this->namespace};";
         $v .= "\n\nuse EasyFast\\Mvc\\Model;";
         $v .= "\n\n/**";
