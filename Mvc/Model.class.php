@@ -51,24 +51,32 @@ abstract class Model
      * @access public
      * @throws EasyFastException
      */
-    public function __construct ($pk = null)
+    public function __construct ($param1 = null, $param2 = null)
     {
-        if (!empty($pk)) {
-            $conn = self::conn();
-            $conn->table(self::getTable());
-            $conn->where(self::getPrimaryKey($conn), $pk);
+        $conn = self::conn();
+        $conn->cleanQuery();
+        $conn->table(self::getTable());
+
+        if (!is_null($param1) && is_null($param2)) {
+            $conn->where(self::getPrimaryKey($conn), $param1);
+        } elseif (!is_null($param1) && !is_null($param2)) {
+            $conn->where($param1, $param2);
+        }
+
+        if (!is_null($param1) || !is_null($param2)) {
             $result = $conn->select();
-            self::$conn = null;
-            
+            $conn->cleanQuery();
+
             if (isset($result[0])) {
                 foreach ($result[0] as $key => $val) {
                     $methodProp = 'set' . Utils::snakeToCamelCase($key);
                     $this->$methodProp($val);
                 }
             } else {
-                throw new EasyFastException('Não existe nenhum registro em \'' . self::getTable() . '\' com \'' . self::getPrimaryKey($conn)  . '\' = \'' . $pk . '\'');
+                throw new EasyFastException('Não existe nenhum registro em \'' . self::getTable() . '\' com \'' . self::getPrimaryKey($conn)  . '\' = \'' . $param1 . '\'');
             }
-            
+
+            self::$result = $this;
         }
     }
     
@@ -122,7 +130,7 @@ abstract class Model
         $class = get_called_class();
         $sth = self::conn()->query('SHOW KEYS FROM ' . self::getTable() . " WHERE Key_name = 'PRIMARY'");
         $result = $sth->fetch();
-        return $result->Column_name;
+        return isset($result->Column_name) ? $result->Column_name : null;
     }
 
     /**
@@ -185,6 +193,23 @@ abstract class Model
         // Retorna objeto
         $class = get_called_class();
         return new $class;
+    }
+
+    /**
+     * Method andWhere
+     * Cria string OR () para comparação separada
+     * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     * @access public
+     * @return Model
+     */
+    public static function andWhere ($call)
+    {
+        $conn = self::conn();
+        $conn->andWhere($call);
+
+        // Retorna objeto
+//        $class = get_called_class();
+//        return new $class;
     }
 
     /**
@@ -381,8 +406,17 @@ abstract class Model
      */
     public function delete ()
     {
+        $primaryKey = $this->getPrimaryKey();
         $conn = $this->conn();
         $conn->table($this->getTable());
+        $vars = get_object_vars($this);
+
+        foreach ($vars as $k => $v) {
+            if (!is_null($v) || $v != '') {
+                $conn->where(Utils::camelToSnakeCase($k), $v);
+            }
+        }
+
         $conn->delete();
     }
 
@@ -413,8 +447,8 @@ abstract class Model
         $conn = self::conn();
         $conn->table($this->getTable());
 
-        if (!is_null($primaryKey)) {
-            $conn->where($primaryKey, $vars[Utils::camelToSnakeCase($primaryKey)]);
+        if (!is_null($primaryKey) && isset($vars[lcfirst(Utils::snakeToCamelCase($primaryKey))])) {
+            $conn->where($primaryKey, $vars[lcfirst(Utils::snakeToCamelCase($primaryKey))]);
         }
 
         $conn->update($varsDB);
