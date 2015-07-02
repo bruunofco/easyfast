@@ -67,5 +67,10 @@ class View extends Smarty
     public function setDirTpl ($val)
     {
         $this->dirTpl = $val;
+
+        $this->template_dir     = $val . '';
+        $this->compile_dir      = $val . 'tpl_tmp/';
+        $this->config_dir       = $val . 'tpl_config/';
+        $this->cache_dir        = $val . 'tpl_cache/';
     }
 }
