@@ -57,10 +57,11 @@ trait Insert
 
                 $this->setQuery($sql);
                 $this->exec($sql);
-                $this->columnValue = null;
+                $this->columnValue = array();
             }
         } catch (PDOException $e) {
-            throw new DBException($e->getMessage());
+            $code = is_int($e->getCode()) ? $e->getCode() : 0;
+            throw new DBException($e->getMessage(), (int) $e->getCode(), $this->getQuery());
         }
 
         return $this->lastInsertId();

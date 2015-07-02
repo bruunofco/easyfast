@@ -210,6 +210,8 @@ trait Select
 
             $this->sth->execute();
 
+            $this->cleanWhere();
+
             return $this->sth->fetchAll();
         } catch (PDOException $e) {
             throw new DBException($e->getMessage(), (int) $e->getCode(), $this->getQuery());

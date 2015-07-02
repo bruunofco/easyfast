@@ -104,10 +104,10 @@ trait CommonCrud
 
     /**
      * Method setRowData
-     * Seta valores para as colunas - INSERT, UPDATE
+     * Set vals to colunas - INSERT, UPDATE
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
-     * @param string|bool|int|array $column
-     * @param string|bool|int|array $value
+     * @param string|bool|int $column
+     * @param string|bool|int $value
      * @throws DBException
      * @return Connection
      */

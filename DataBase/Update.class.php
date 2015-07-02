@@ -63,7 +63,8 @@ trait Update
                 $sth->execute();
                 $this->columnValue = null;
             } catch (PDOException $e) {
-                throw new DBException($e->getMessage(), $e->getCode(), $sql);
+                $code = is_int($e->getCode()) ? $e->getCode() : 0;
+                throw new DBException($e->getMessage(), $code, $sql);
             }
 
             return $this;

@@ -90,11 +90,28 @@ trait WHERE
             $operator = '=';
         }
 
-        $value = addslashes($value);
+//        $value = addslashes($value);
         $this->wherePrepare .= "{$column} {$operator} ? {$opLogic}";
         $this->vals[] = $value;
 
         return $this;
+    }
+
+    /**
+     * Method andWhere
+     * Cria string AND () para comparação separada
+     * @param $call
+     * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     * @access public
+     * @return $this
+     */
+    public function andWhere ($call)
+    {
+        $this->where = substr($this->where, 0, -4);
+        $this->where .= Connection::_AND . '(';
+        call_user_func($call, $this);
+        $this->where = substr($this->where, 0, -4);
+        $this->where .= ') ' . Connection::_AND;
     }
 
     /**
@@ -153,5 +170,19 @@ trait WHERE
         if (!empty($this->where)) {
             return 'WHERE ' . substr($this->wherePrepare, 0, strripos(trim($this->wherePrepare), ' '));
         }
+    }
+
+    /**
+     * Method cleanWhere
+     * Clean where
+     * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     * @return bool
+     */
+    public function cleanWhere ()
+    {
+        $this->where = null;
+        $this->wherePrepare = null;
+
+        return true;
     }
 }
