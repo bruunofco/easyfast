@@ -128,30 +128,30 @@ class App
         if (!isset($_GET['url'])) {
             $index = isset(self::$route['index']) ? self::$route['index'] : null;
             $this->routeLocation($index);
-            exit();
-        }
-
-        $queryStrings = array_filter(explode('/', $_GET['url']));
-        $nameClass = 'Controller\\' . ucfirst(Utils::hiphenToCamelCase($queryStrings[0]));
-
-        if (!class_exists($nameClass)) {
-            throw new EasyFastException("Class \"$nameClass\" not found.");
-        }
-
-        $class = new $nameClass;
-
-        if (count($queryStrings) > 1) {
-            $nameMethod = Utils::hiphenToCamelCase($queryStrings[1]);
-            if (method_exists($class, $nameMethod)) {
-                $class->$nameMethod();
-            } else {
-                throw new EasyFastException("Method \"$nameMethod\" not found.");
-            }
         } else {
-            if (method_exists($class, 'view')) {
-                $class->view();
+
+            $queryStrings = array_filter(explode('/', $_GET['url']));
+            $nameClass = 'Controller\\' . ucfirst(Utils::hiphenToCamelCase($queryStrings[0]));
+
+            if (!class_exists($nameClass)) {
+                throw new EasyFastException("Class \"$nameClass\" not found.");
+            }
+
+            $class = new $nameClass;
+
+            if (count($queryStrings) > 1) {
+                $nameMethod = Utils::hiphenToCamelCase($queryStrings[1]);
+                if (method_exists($class, $nameMethod)) {
+                    $class->$nameMethod();
+                } else {
+                    throw new EasyFastException("Method \"$nameMethod\" not found.");
+                }
             } else {
-                throw new EasyFastException('Error generating display.');
+                if (method_exists($class, 'view')) {
+                    $class->view();
+                } else {
+                    throw new EasyFastException('Error generating display.');
+                }
             }
         }
 
@@ -206,6 +206,23 @@ class App
         }
 
         return self::$restful;
+    }
+
+    /**
+     * Method execMethodBeforeRunApp
+     * Add method execute before run app
+     * @author Bruno Oliveira bruno@salluzweb.com.br>
+     */
+    public function execMethodBeforeRunApp ($class, $method, $params = array())
+    {
+        //Registra AutoLoader
+        spl_autoload_register(array($this, 'loader'));
+
+        if (!is_object($class)) {
+            $class = new $class;
+        }
+
+        call_user_func_array(array($class, $method), $params);
     }
 
 }
