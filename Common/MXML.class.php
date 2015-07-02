@@ -65,21 +65,22 @@ class MXML extends DOMDocument
      * Method load
      * Carrega um arquivo XML e atribui a propriedade $dom
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
-     * @param String $xml Arquivo ou URL do XML
-     * @param String $option Opções
+     * @param string $dirXml Arquivo ou URL do XML
+     * @param string $option Opções
+     * @param bool $checkXml Check XML is valid
      * @return void
      * @throws EasyFastException
      */
-    public function load ($xml, $option = null)
+    public function load ($dirXml, $option = null, $checkXml = false)
     {
-        if (!file_exists($xml)) {
-            throw new EasyFastException("File \"$xml\"not found.");
+        if (!file_exists($dirXml)) {
+            throw new EasyFastException("File \"$dirXml\"not found.");
         }
 
         $this->preserveWhiteSpace = false;
-        parent::load($xml, $option);
+        parent::load($dirXml, $option);
 		parent::xinclude();
-        if (!parent::validate()) {
+        if (!parent::validate() && $checkXml) {
             throw new EasyFastException('Invalid XML File.');
         }
     }
@@ -88,15 +89,15 @@ class MXML extends DOMDocument
      * Method loadXml()
      * Carrega XML em formato string e atribui a propriedade $dom
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
-     * @param String $xml Arquivo ou URL do XML
-     * @param String $option Opções
+     * @param string $xml Arquivo ou URL do XML
+     * @param string $option Opções
      * @return void
      * @throws EasyFastException
      */
-    public function loadXML ($xml, $option = null)
+    public function loadXML ($stringXml, $option = null)
     {
         $this->preserveWhiteSpace = false;
-        parent::loadXML($xml, $option);
+        parent::loadXML($stringXml, $option);
         if (parent::validate()) {
             throw new EasyFastException('Invalid XML.');
         }
@@ -169,7 +170,6 @@ class MXML extends DOMDocument
      * Method getTagAttr()
      * Verifica existencia da tag, caso exista retorna valor da tag
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
-     * @created 17/09/2014
      * @param String $tagName Nome da tag
      * @param String $attr Atributo a ser recuperado
      * @return String|Object quando encontrado apenas uma tag|quando encontrado mais de uma tag
