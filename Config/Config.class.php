@@ -42,7 +42,7 @@ trait Config
      * @var string $dirEasyFast    Diretório do EasyFast
      * @access public
      */
-    public static $appName, $appSessionName, $appUrl, $appDir, $appDirLog, $appDirTpl, $dirEasyFast;
+    public static $appName, $appSessionName, $appUrl, $appDir, $appDirLog, $appDirTpl, $dirEasyFast, $appConfigs;
 
     /**
      * @var array $dbConfigs
@@ -269,5 +269,29 @@ trait Config
         } else {
             self::$dbMain = $db;
         }
+    }
+
+    /**
+     * Method setNewVarConfig
+     * set new var configuration
+     * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     * @access public
+     * @return void
+     */
+    public static function setNewVarConfig ($config, $value)
+    {
+        self::$appConfigs[$config] = $value;
+    }
+
+    /**
+     * Method getVarConfig
+     * get var configuration
+     * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     * @access public
+     * @return mixed
+     */
+    public static function getVarConfig ($config)
+    {
+        return self::$appConfigs[$config];
     }
 }
