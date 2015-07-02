@@ -17,9 +17,9 @@
 
 namespace EasyFast\Http;
 
-use StdClass;
-use EasyFast\Common\Utils;
 use EasyFast\Exceptions\EasyFastException;
+use EasyFast\Common\Utils;
+use StdClass;
 
 /**
  * Class Restful
@@ -59,7 +59,6 @@ class Restful
     {
         $method = strtoupper($method);
         try {
-
             if ($this->checkUrl($url) && ($_SERVER['REQUEST_METHOD'] == $method && is_callable($callback))) {
 
                 if (is_array($callback) && $argsAssoc) {
@@ -87,7 +86,7 @@ class Restful
             $this->response('status => error | message => '. $e->getMessage(), 412);
         }
 
-        //return false;
+        return false;
     }
 
 
@@ -155,14 +154,16 @@ class Restful
      * @access public
      * @return string
      */
-    public static function response ($response, $httpStatus = null)
+    public static function response ($response, $httpStatus = null, $break = true)
     {
         if (!empty($httpStatus)) {
             header("HTTP/1.1 {$httpStatus}");
         }
 
         echo Utils::jsonEncode($response);
-        exit();
+        if ($break) {
+            exit();
+        }
     }
 
 }
