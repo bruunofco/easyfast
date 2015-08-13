@@ -85,6 +85,26 @@ class Request
     {
         return $this->responseHeader;
     }
+    
+    /**
+     * Method getHeader
+     * Return header content by parameter
+     * @author Hiago Souza <hiago@sparkweb.com.br>
+     * @return String
+     * @param $name
+     * 
+     */
+    public function getHeader( $name ) 
+    {
+        foreach($this->responseHeader as $headerline) {
+            $check = explode(":",$headerline);
+            if(strtolower($check[0]) == strtolower($name)) {
+                return trim($check[1]);
+            }
+        }
+        
+        return null;
+    }
 
     /**
      * Method getResponseCode
@@ -138,7 +158,7 @@ class Request
      * @param string $method
      * @return object
      */
-    public function exec ($method, $content = null, $header = null)
+    public function exec ($method, $content = null, $header = array())
     {
         $timeInit = new DateTime();
         $this->method = $method;
