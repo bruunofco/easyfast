@@ -101,7 +101,7 @@ class Connection
             case 'pgsql':
                 $port  = is_null($port) ? '5432' : $port;
                 try {
-                    $this->$conn = new PDO("pgsql:dbname={$dbName}; users={$userName}; password={$password}; host={$hostName}; port={$port}");
+                    $this->conn = new PDO("pgsql:dbname={$dbName}; users={$userName}; password={$password}; host={$hostName}; port={$port}");
                 } catch (PDOException $e) {
                     throw new DBException($e->getMessage());
                 }
