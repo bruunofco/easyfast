@@ -237,7 +237,7 @@ trait Config
             return self::$appDirTpl;
         } else {
             if (preg_match('/[\\\\|\/]$/', $dir)) {
-                self::$appDriTpl = $dir;
+                self::$appDirTpl = $dir;
             } else {
                 self::$appDirTpl = $dir . '/';
             }
