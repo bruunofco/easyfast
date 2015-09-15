@@ -43,6 +43,11 @@ trait Config
      * @access public
      */
     public static $appName, $appSessionName, $appUrl, $appDir, $appDirLog, $appDirTpl, $dirEasyFast, $appConfigs;
+    
+    /**
+     * @var array
+     */
+    public static $viewConfig = array();
 
     /**
      * @var array $dbConfigs
@@ -85,6 +90,7 @@ trait Config
         } else {
             $config = simplexml_load_file($config);
             $this->config($config);
+            $this->setViewConfig($config);
         }
     }
 
@@ -103,6 +109,22 @@ trait Config
         $this->setDirApp($config->app->dir);
         $this->setDirLog($config->app->dirLog);
         $this->appUrl($config->app->url);
+    }
+    
+    /**
+     * setViewConfig
+     * Set vars utils in View
+     * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     * @param $config
+     */
+    private function setViewConfig($config)
+    {
+        if (isset($config->view)) {
+            $total = count($config->view);
+            foreach ($config->view->children() as $key => $value) {
+                static::$viewConfig[$key] = $config->view->{$key}->__toString();
+            }
+        }
     }
 
     /**
