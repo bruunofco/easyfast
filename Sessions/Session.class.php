@@ -100,13 +100,13 @@ class Session
     public static function sessionStatus ()
     {
         switch (session_status()) {
-            case 'PHP_SESSION_NONE':
+            case PHP_SESSION_NONE:
                 throw new EasyFastException('Sessão não foi iniciada.');
                 break;
-            case 'PHP_SESSION_DISABLED':
+            case PHP_SESSION_DISABLED:
                 throw new EasyFastException('Sessão desativada.');
                 break;
-            case 'PHP_SESSION_ACTIVE':
+            case PHP_SESSION_ACTIVE:
                 return true;
                 break;
         }
