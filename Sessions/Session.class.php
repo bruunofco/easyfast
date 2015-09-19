@@ -36,9 +36,10 @@ class Session
     public function __construct ()
     {
         try {
-            self::sessionStatus();
-            ob_start();
-            session_start();
+            if (session_status() != PHP_SESSION_ACTIVE) {
+                ob_start();
+                session_start();
+            }
         } catch (EasyFastException $e) {}
     }
 
