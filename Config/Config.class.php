@@ -106,9 +106,9 @@ trait Config
         static::$appSessionName = 'EasyFast';
 
         static::$dirEasyFast = __DIR__ . '/../../';
-        $this->setDirApp($config->app->dir);
-        $this->setDirLog($config->app->dirLog);
-        $this->appUrl($config->app->url);
+        $this->setDirApp((string) $config->app->dir);
+        $this->setDirLog((string) $config->app->dirLog);
+        $this->appUrl((string) $config->app->url);
     }
     
     /**
