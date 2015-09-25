@@ -142,7 +142,9 @@ class App
             if (count($queryStrings) > 1) {
                 $nameMethod = Utils::hiphenToCamelCase($queryStrings[1]);
                 if (method_exists($class, $nameMethod)) {
-                    $class->$nameMethod();
+                    unset($queryStrings[0]);
+                    unset($queryStrings[1]);
+                    call_user_func_array(array($class, $nameMethod), $queryStrings);
                 } else {
                     throw new EasyFastException("Method \"$nameMethod\" not found.");
                 }
@@ -154,7 +156,6 @@ class App
                 }
             }
         }
-
     }
 
     /**
