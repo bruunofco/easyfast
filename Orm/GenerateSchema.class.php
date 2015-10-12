@@ -38,17 +38,25 @@ trait GenerateSchema
     private $fileName;
 
     /**
+     * @var array Values do not set as default
+     */
+    private $noValueDefault = array(
+        'CURRENT_TIMESTAMP'
+    );
+
+    /**
      * Method __construct
      * Executa script SQL para resgatar informações sobre o banco de dados
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @param $db
      * @throws EasyFastException
+     * @return mixed
      */
     public function createSchema ($db = null)
     {
         $this->conn = new Connection($db);
         $stmt =  $this->conn->query("SELECT TABLE_NAME, COLUMN_NAME, TABLE_SCHEMA, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH,
-                                     IS_NULLABLE, COLUMN_KEY, EXTRA
+                                     IS_NULLABLE, COLUMN_KEY, COLUMN_DEFAULT, EXTRA
                                      FROM information_schema.COLUMNS
                                      WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME IN
                                      (SELECT TABLE_NAME FROM information_schema.TABLES T WHERE TABLE_SCHEMA = DATABASE())");
@@ -73,6 +81,10 @@ trait GenerateSchema
             $attrName = $this->xml->createAttribute('name', $row->COLUMN_NAME);
             $attrType = $this->xml->createAttribute('type', $row->DATA_TYPE);
             $column = $this->tablesElement->appendChild($column);
+            if (!empty($row->COLUMN_DEFAULT) && !in_array($row->COLUMN_DEFAULT, $this->noValueDefault)) {
+                $valueDefault = $this->xml->createAttribute('valueDefault', $row->COLUMN_DEFAULT);
+                $column->appendChild($valueDefault);
+            }
             $column->appendChild($attrName);
             $column->appendChild($attrType);
             if (isset($row->CHARACTER_MAXIMUM_LENGTH)) {
