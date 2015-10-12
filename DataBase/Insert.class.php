@@ -61,7 +61,7 @@ trait Insert
             }
         } catch (PDOException $e) {
             $code = is_int($e->getCode()) ? $e->getCode() : 0;
-            throw new DBException($e->getMessage(), (int) $e->getCode(), $this->getQuery());
+            throw new DBException($e->getMessage(), $code, $this->getQuery());
         }
 
         return $this->lastInsertId();
