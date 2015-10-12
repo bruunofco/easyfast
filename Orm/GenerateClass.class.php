@@ -158,7 +158,12 @@ trait GenerateClass
                     if ($columns->tagName == 'column') {
 
                         $columnName  = $columns->getAttribute('name');
+                        $columnValue = $columns->getAttribute('valueDefault');
                         $property    = lcfirst(Utils::snakeToCamelCase($columnName));
+
+                        if (!empty($columnValue)) {
+                            $property = "{$property} = '{$columnValue}'";
+                        }
 
                         $this->propertys .= "\tprotected \$" . $property . ";\n";
                         $this->methodSet($columnName);
