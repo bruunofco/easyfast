@@ -82,7 +82,9 @@ abstract class Model
     
     public function __destruct ()
     {
-        self::$conn = null;    
+    	if(!self::$conn->inTransaction()) {
+        	self::$conn = null;
+    	}
     }
 
     /**
