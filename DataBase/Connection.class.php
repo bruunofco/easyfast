@@ -296,7 +296,11 @@ class Connection
      */
     public function inTransaction ()
     {
-        return $this->conn->inTransaction();
+        if(!empty($this->conn)) {
+            return $this->conn->inTransaction();
+        } else {
+            return false;
+        }
     }
 
     /**
