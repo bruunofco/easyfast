@@ -82,7 +82,7 @@ abstract class Model
     
     public function __destruct ()
     {
-    	if(!self::$conn->inTransaction()) {
+    	if(!is_null(self::$conn) && !self::$conn->inTransaction()) {
         	self::$conn = null;
     	}
     }
@@ -329,7 +329,9 @@ abstract class Model
             self::$result = $instance;
         }
 
-        self::$conn = null;
+        if(!is_null(self::$conn) && !self::$conn->inTransaction()) {
+            self::$conn = null;
+        }
 
         return $instance;
     }
@@ -473,8 +475,8 @@ abstract class Model
 		}	
         
         self::$result = $conn->select();
-        //self::$conn = null;
-	if(!$conn->inTransaction()) {
+        
+	if(!is_null(self::$conn) && !$conn->inTransaction()) {
             self::$conn = null;
         }
         
