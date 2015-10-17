@@ -471,8 +471,11 @@ abstract class Model
 		}	
         
         self::$result = $conn->select();
-        self::$conn = null;
-
+        //self::$conn = null;
+	if(!$conn->inTransaction()) {
+            self::$conn = null;
+        }
+        
         return self::$result;
     }
 }
