@@ -21,7 +21,7 @@ use EasyFast\Exceptions\DBException;
 
 /**
  * Class CommonCrud
- * Métodos comum para CRUD
+ * Methods for CRUD
  * @package EasyFast\DataBase
  * @author Bruno Oliveira <bruno@salluzweb.com.br>
  */
@@ -34,13 +34,13 @@ trait CommonCrud
 
     /**
      * Traits
-     * Where - Cria critério de seleção
+     * Where - Selection Criteria
      */
     use Where;
 
     /**
      * Method setQuery
-     * Seta query executada
+     * Set a query to execute
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access protected
      * @param string $qr
@@ -49,14 +49,14 @@ trait CommonCrud
     protected static function setQuery ($qr)
     {
         if (!is_string($qr)) {
-            throw new DBException('Query inválida.');
+            throw new DBException('Invalid Query.');
         }
         self::$query = $qr;
     }
 
     /**
      * Method getQuery
-     * Obtêm a ultima query executa
+     * Get last executed query
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
      * @return string
@@ -68,7 +68,7 @@ trait CommonCrud
 
     /**
      * Method setTable
-     * Seta a tabela a ser usada na query
+     * Set a table to be used in the query
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
      * @param string $table
@@ -78,7 +78,7 @@ trait CommonCrud
     public static function table ($table)
     {
         if (!is_string($table)) {
-            throw new DBException('Nome inválido. Nome de ser uma string.');
+            throw new DBException('Invalid Name. Must be a string.');
         }
 
         self::$table = $table;
@@ -88,24 +88,25 @@ trait CommonCrud
 
     /**
      * Method getTable
-     * Obtêm a tabela que está sendo usada
+     * Get the current Table
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
-     * @access public
-     * @return string
+     * @access protected
      * @throws DBException
+     * @return string
      */
     protected static function getTable ()
     {
         if (!isset(self::$table)) {
-            throw new DBException('Tabela não informada. É necessário informar a tabela para executar query.');
+            throw new DBException('Unknown table. It is necessary to inform the table to perform a query.');
         }
         return self::$table . "\n";
     }
 
     /**
      * Method setRowData
-     * Set vals to colunas - INSERT, UPDATE
+     * Set valuess to columns - INSERT, UPDATE
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     * @access public
      * @param string|bool|int $column
      * @param string|bool|int $value
      * @throws DBException
@@ -123,7 +124,7 @@ trait CommonCrud
         } elseif (is_int($value)) {
             $this->columnValue[$column] = $value;
         } else {
-            throw new DBException('Parâmetros inválidos. Não foi possível atribuir valores.');
+            throw new DBException('Invalid Parameters. Could not assign values');
         }
 
         return $this;
@@ -131,8 +132,9 @@ trait CommonCrud
 
     /**
      * Method cleanQuery
-     * Limpa a última query executada na classe
+     * Clean the last executed query
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     * @access public
      * @return void
      */
     public function cleanQuery () 
