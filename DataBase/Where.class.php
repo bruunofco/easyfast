@@ -19,7 +19,7 @@ namespace EasyFast\DataBase;
 
 /**
  * Trait WHERE
- * Cria critério de seleção para banco de dados
+ * Create selection criteria for database
  * @author Bruno Oliveira <bruno@salluzweb.com.br>
  * @package EasyFast\DataBase
  */
@@ -31,14 +31,14 @@ trait WHERE
 
     /**
      * Method where
-     * Cria string de comparação
+     * Create comparison string
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
      * @param string $column
-     * @param string $operator|$value
+     * @param string $operator
      * @param string|null $value
      * @param string|null $opLogic
-     * @return $this
+     * @return WHERE
      */
     public function where ($column, $operator, $value = null, $opLogic = Connection::_AND)
     {
@@ -73,18 +73,18 @@ trait WHERE
 
     /**
      * Method wherePrepare
-     * Cria string de comparação
+     * Prepare comparison string
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access protected
      * @param string $column
-     * @param string $operator|$value
+     * @param string $operator
      * @param string|null $value
      * @param string|null $opLogic
      * @return $this
      */
     protected function wherePrepare ($column, $operator, $value = null, $opLogic = Connection::_AND)
     {
-        //TODO: Estudar uma melhor solução
+        //TODO: Improve this solution.
         if (is_null($value)) {
             $value = $operator;
             $operator = '=';
@@ -99,10 +99,10 @@ trait WHERE
 
     /**
      * Method andWhere
-     * Cria string AND () para comparação separada
-     * @param $call
+     * Create the string AND () for the comparison
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
+     * @param $call
      * @return $this
      */
     public function andWhere ($call)
@@ -116,7 +116,7 @@ trait WHERE
 
     /**
      * Method orWhere
-     * Cria string OR () para comparação separada
+     * Create the string OR () for the comparison
      * @param $call
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
@@ -133,20 +133,20 @@ trait WHERE
 
     /**
      * Method getPrepareVals
-     * Retorna os valores do WherePrepare
+     * Return the values of WherePrepare
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
-     * @access public
+     * @access protected
      * @return mixed
      */
     protected function getPrepareVals ()
     {
-        //TODO: Estudar uma melhor solução
+        //TODO: Improve this solution
         return $this->vals;
     }
 
     /**
      * Method getWhere
-     * Obtêm a string WHERE
+     * Get the WHERE string
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
      * @return string
@@ -160,9 +160,9 @@ trait WHERE
 
     /**
      * Method getWherePrepare
-     * Obtêm a string WHERE
+     * Get the WHERE prepared string
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
-     * @access public
+     * @access protected
      * @return string
      */
     protected function getWherePrepare ()
@@ -174,8 +174,9 @@ trait WHERE
 
     /**
      * Method cleanWhere
-     * Clean where
+     * Clean the where clause
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     * @access public
      * @return bool
      */
     public function cleanWhere ()
