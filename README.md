@@ -45,4 +45,7 @@ The EasyFast PHP framework is an open-sourced software licensed under the [Apach
 
 > Mauro Fileto <mfileto@netcaster.us>
 
-#### Soon a fast start
+#### Soon a fast start 
+
+## Credits
+[Smarty: Template Engine](https://github.com/smarty-php/smarty)
