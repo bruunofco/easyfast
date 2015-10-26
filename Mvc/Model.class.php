@@ -136,6 +136,26 @@ abstract class Model
     }
 
     /**
+     * Method getPrimaryKeys
+     * Get the name of colunms of a compound primary key
+     * @author James Miranda <jameswpm@gmail.com>
+     * @access private
+     * @return array
+     */
+    private static function getPrimaryKeys ()
+    {
+        $class = get_called_class();
+        $sth = self::conn()->query('SHOW KEYS FROM ' . self::getTable() . " WHERE Key_name = 'PRIMARY'");
+        $result = $sth->fetchAll();
+        $return = array();
+        foreach ($result as $res) {
+            array_push($retorno,$res->Column_name);
+        }
+        return $return;
+        //TODO: check the use of the method getPrimaryKey and replace it with this method
+    }
+
+    /**
      * Method getLastId
      * Retorna o ultimo Id da primeira Primary Key
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
@@ -432,7 +452,7 @@ abstract class Model
      */
     public function update ()
     {
-        $primaryKey = $this->getPrimaryKey();
+        $primaryKeys = $this->getPrimaryKeys();
         $class      = get_class($this);
         $class      = explode('\\', $class);
         $class      = "$class[0]\\Traits\\Trait$class[1]";
@@ -443,7 +463,7 @@ abstract class Model
         $varsDB    = array();
 
         foreach ($vars as $key => $val) {
-            if (($r->hasProperty($key) && isset($val)) && $key != $primaryKey) {
+            if (($r->hasProperty($key) && isset($val)) && !in_array(Utils::camelToSnakeCase($key),$primaryKeys)) {
                 $varsDB[Utils::camelToSnakeCase($key)] = $val;
             }
         }
@@ -451,8 +471,13 @@ abstract class Model
         $conn = self::conn();
         $conn->table($this->getTable());
 
-        if (!is_null($primaryKey) && isset($vars[lcfirst(Utils::snakeToCamelCase($primaryKey))])) {
-            $conn->where($primaryKey, $vars[lcfirst(Utils::snakeToCamelCase($primaryKey))]);
+        if (!empty($primaryKeys)) {
+            foreach ($primaryKeys as $primary) {
+                if (!is_null($primary)) {
+                    $snake = lcfirst(Utils::snakeToCamelCase($primary));
+                    $conn->where($primary,'=',$vars[$snake]);
+                }
+            }
         }
 
         $conn->update($varsDB);
