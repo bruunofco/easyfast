@@ -1,0 +1,16 @@
+{
+    "name": "bruno/easyfast",
+    "description": "The EasyFast PHP Framework",
+    "type": "project",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "bruunofco",
+            "email": "brunofco_b2@yahoo.com.br"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.5.3" 
+    }
+}
