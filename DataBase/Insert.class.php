@@ -22,7 +22,7 @@ use EasyFast\Exceptions\DBException;
 
 /**
  * Class Insert
- * Abstrai a escrita de código SQL para execução de INSERT
+ * Create and manage the SQL command for INSERT
  * @package EasyFast\DataBase
  * @author Bruno Oliveira <bruno@salluzweb.com.br>
  */
@@ -30,10 +30,10 @@ trait Insert
 {
     /**
      * Method insert
-     * Cria e executa script para INSERT
+     * Create and execute INSERT using PDO
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
-     * @param array|null $rowData Array com as propriedades
+     * @param array|null $rowData Array containing the properties
      * @throws DBException
      */
     public function insert ($rowData = null)

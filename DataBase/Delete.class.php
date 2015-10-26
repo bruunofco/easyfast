@@ -22,7 +22,7 @@ use EasyFast\Exceptions\DBException;
 
 /**
  * Class Delete
- * Abstrai a escrita de código SQL para executar DELETE
+ * Create and manage the SQL command for DELETE
  * @package EasyFast\DataBase
  * @author Bruno Oliveira <bruno@salluzweb.com.br>
  */
@@ -30,13 +30,13 @@ trait Delete
 {
     /**
      * Method delete
-     * Cria e executa script para DELETE
-     * Usando Prepare PDO
-     * @uses Where::getWherePrepare Obtêm Where para preprare
-     * @uses Where::getPrepareVals Obtêm valores do prepare
-     * @uses Connection::prepare Prepara o PDO para receber um script SQL
+     * Create and execute DELETE using PDO
+     * @uses Where::getWherePrepare Get the created where
+     * @uses Where::getPrepareVals get the values from Prepare
+     * @uses Connection::prepare Prepare a PDO to receive a SQL script
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
+     * @throws DBException
      */
     public function delete ()
     {
@@ -59,7 +59,7 @@ trait Delete
         }
 
         if (!$sth->rowCount()) {
-            throw new DBException('Não foi possível executar delete.');
+            throw new DBException('Unable to execute delete.');
         }
 
         return $this;

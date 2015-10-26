@@ -22,7 +22,7 @@ use EasyFast\Exceptions\DBException;
 
 /**
  * Class Select
- * Abstrai escrita de código SQL para executar SELECT
+ * Create and manage the SQL command for SELECT
  * @package EasyFast\DataBase
  */
 trait Select
@@ -36,13 +36,13 @@ trait Select
 
     /**
      * Method join
-     * Cria JOIN no código SQL
+     * Create a JOIN in the SQL
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
-     * @param string $table Nome da tabela
-     * @param string $column1 Coluna de comparação
-     * @param string $operator Operador de comparação
-     * @param string $column2 Coluna de comparação
+     * @param string $table Table name
+     * @param string $column1 First column to compare
+     * @param string $operator Comparison operator
+     * @param string $column2 Second column to compare
      * @return Connection
      */
     public function join ($table, $column1, $operator, $column2)
@@ -53,9 +53,10 @@ trait Select
 
     /**
      * Method getJoin
-     * Obtêm o JOIN criado
+     * Get the created JOIN
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access private
+     * @return string|null
      */
     private function getJoin ()
     {
@@ -67,13 +68,13 @@ trait Select
 
     /**
      * Method leftJoin
-     * Cria LEFT JOIN no código SQL
+     * Create a LEFT JOIN in the SQL
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
      * @param string $table Nome da tabela
-     * @param string $column1 Coluna de comparação
-     * @param string $operator Operador de comparação
-     * @param string $column2 Coluna de comparação
+     * @param string $column1 First column to compare
+     * @param string $operator Comparison operator
+     * @param string $column2 Second column to compare
      * @return Connection
      */
     public function leftJoin ($table, $column1, $operator, $column2)
@@ -82,10 +83,11 @@ trait Select
     }
 
     /**
-     * Method getJoin
-     * Obtêm o LEFT JOIN criado
+     * Method getLeftJoin
+     * Get the created LEFT JOIN
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
-     * @access protected
+     * @access private
+     * @return string|null
      */
     private function getLeftJoin ()
     {
@@ -98,7 +100,7 @@ trait Select
 
     /**
      * Method limit
-     * Adiciona LIMIT ao código SQL
+     * Add a LIMIT  parameter to the SQL script
      * @author Bruno Oliveira
      * @access public
      * @param int $limit
@@ -112,10 +114,10 @@ trait Select
 
     /**
      * Method getLimit
-     * Obtêm o LIMIT
+     * Get the created LIMIT
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access private
-     * @return string
+     * @return string|null
      */
     private function getLimit ()
     {
@@ -127,10 +129,10 @@ trait Select
 
     /**
      * Method col
-     * Seta colunas do banco de dados
-     * @param string $col Coluna a retornar no banco de dados
+     * Add a counm to the colunms for the SELECT
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
+     * @param string $col A colunm from the database
      * @return Connection
      */
     public function col ($col)
@@ -141,11 +143,11 @@ trait Select
 
     /**
      * Method orderBy
-     * Cria ordenação
+     * Add a ORDER BY to the SQL script
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
-     * @param string $column
-     * @param string $val
+     * @param string $column Colunm name
+     * @param string $val 
      * @return Connection
      */
     public function orderBy ($column, $val)
@@ -156,9 +158,10 @@ trait Select
 
     /**
      * Method getOrderBy
-     * Retorna OrderBy
+     * Get the created ORDER BY
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access private
+     * @return string
      */
     private function getOrderBy ()
     {
@@ -174,7 +177,7 @@ trait Select
 
     /**
      * Method select
-     * Cria e executa script para SELECT
+     * Create and execute SELECT using PDO
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
      * @return mixed
@@ -220,7 +223,7 @@ trait Select
 
     /**
      * Method rowCount
-     * Retorna o número de linhas retornadas pela query
+     * Returns the number of affected rows after SELECT
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
      * @return string
