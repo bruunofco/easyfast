@@ -28,6 +28,27 @@ Try EasyFast PHP and share your experience. We love feedback!
 ## Documentation
 We are still developing the documentation, help us!
 
+## Composer
+
+To install EasyFast PHP Framework with composer you simply need to create a composer.json in your project root and add:
+
+```json
+{
+    "require": {
+        "bruunofco/easyfast": "dev-master"
+    }
+}
+```
+
+Then run
+
+```bash
+$ wget -nc http://getcomposer.org/composer.phar
+$ php composer.phar install
+```
+
+You have now EasyFast PHP Framework installed in vendor/bruunofco/easyfast
+
 ## Contributing
 Still under development, we are accepting collaboration in order to create a successful tool, created on top of this passionate language PHP.
 
