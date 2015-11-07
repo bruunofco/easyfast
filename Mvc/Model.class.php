@@ -134,6 +134,31 @@ abstract class Model
         $result = $sth->fetch();
         return isset($result->Column_name) ? $result->Column_name : null;
     }
+    
+    /**
+     * Method getPrimaryKeys
+     * get the primary key in a vector (useful in composite keys)
+     * @author Hiago Souza <hiago@sparkweb.com.br>
+     * @access private
+     * @return array|null
+     */
+    private static function getPrimaryKeys() {
+        $class = get_called_class();
+        $sth = self::conn()->query('SHOW KEYS FROM ' . self::getTable() . " WHERE Key_name = 'PRIMARY'");
+        $result = $sth->fetchAll();
+
+        if(count($result) == 0) {
+            return null;
+        }
+
+        $primarykeys = array();
+
+        foreach($result as $r) {
+            array_push($primarykeys, $r->Column_name);
+        }
+
+        return $primarykeys;
+    }
 
     /**
      * Method getPrimaryKeys
@@ -430,14 +455,16 @@ abstract class Model
      */
     public function delete ()
     {
-        $primaryKey = $this->getPrimaryKey();
+        $primaryKeys = $this->getPrimaryKeys();
         $conn = $this->conn();
         $conn->table($this->getTable());
         $vars = get_object_vars($this);
 
         foreach ($vars as $k => $v) {
             if (!is_null($v) || $v != '') {
-                $conn->where(Utils::camelToSnakeCase($k), $v);
+            	if(in_array($k,$primaryKeys)) {
+                	$conn->where(Utils::camelToSnakeCase($k), $v);
+            	}
             }
         }
 
