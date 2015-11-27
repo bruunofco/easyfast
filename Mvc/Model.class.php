@@ -161,26 +161,6 @@ abstract class Model
     }
 
     /**
-     * Method getPrimaryKeys
-     * Get the name of colunms of a compound primary key
-     * @author James Miranda <jameswpm@gmail.com>
-     * @access private
-     * @return array
-     */
-    private static function getPrimaryKeys ()
-    {
-        $class = get_called_class();
-        $sth = self::conn()->query('SHOW KEYS FROM ' . self::getTable() . " WHERE Key_name = 'PRIMARY'");
-        $result = $sth->fetchAll();
-        $return = array();
-        foreach ($result as $res) {
-            array_push($retorno,$res->Column_name);
-        }
-        return $return;
-        //TODO: check the use of the method getPrimaryKey and replace it with this method
-    }
-
-    /**
      * Method getLastId
      * Retorna o ultimo Id da primeira Primary Key
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
