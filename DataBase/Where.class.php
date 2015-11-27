@@ -25,7 +25,7 @@ namespace EasyFast\DataBase;
  */
 trait WHERE
 {
-    private $where;
+    public $where;
     private $wherePrepare;
     private $vals;
 
@@ -90,7 +90,6 @@ trait WHERE
             $operator = '=';
         }
 
-//        $value = addslashes($value);
         $this->wherePrepare .= "{$column} {$operator} ? {$opLogic}";
         $this->vals[] = $value;
 

@@ -38,7 +38,7 @@ class Restful
      * Method __construct
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      */
-    public function __construct ()
+    public function __construct()
     {
         if (empty($_SERVER['REQUEST_METHOD'])) {
             throw new EasyFastException('REQUEST_METHOD não disponivel.');
@@ -55,7 +55,7 @@ class Restful
      * @param bool $argsAssoc Informa se os argumentos são associativos
      * @return bool|callback
      */
-    public function server ($method, $url, $callback, $argsAssoc = true)
+    public function server($method, $url, $callback, $argsAssoc = true)
     {
         $method = strtoupper($method);
         try {
@@ -67,13 +67,13 @@ class Restful
                     if (empty($data)) {
                         $data = new StdClass();
                     }
-                    
+
                     foreach ($this->queryString as $key => $val) {
                         $data->$key = $val;
                     }
 
-                    Utils::callMethodArgsOrder($callback[0], $callback[1], (array) $data);
-                } elseif (is_array($callback)) {                             
+                    Utils::callMethodArgsOrder($callback[0], $callback[1], (array)$data);
+                } elseif (is_array($callback)) {
                     call_user_func_array(array(new $callback[0], $callback[1]), $this->queryString);
                 } else {
                     call_user_func_array($callback, $this->queryString);
@@ -83,7 +83,7 @@ class Restful
             }
 
         } catch (EasyFastException $e) {
-            $this->response('status => error | message => '. $e->getMessage(), 412);
+            $this->response('status => error | message => ' . $e->getMessage(), 412);
         }
 
         return false;
@@ -97,20 +97,22 @@ class Restful
      * @access public
      * @param bool $bool
      */
-    public function crossOrigin ($bool) {
+    public function crossOrigin($bool)
+    {
         if ($bool) {
             if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-                if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD']) && (   
-                   $_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'] == 'POST' || 
-                   $_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'] == 'DELETE' || 
-                   $_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'] == 'PUT' )) {
-                         header('Access-Control-Allow-Origin: *');
-                         header('Access-Control-Allow-Headers: X-Requested-With');
-                         header('Access-Control-Allow-Headers: Content-Type');
-                         header('Access-Control-Allow-Methods: POST, GET, OPTIONS, DELETE, PUT'); // http://stackoverflow.com/a/7605119/578667
-                         header('Access-Control-Max-Age: 86400'); 
-                  }
-              exit;
+                if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD']) && (
+                        $_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'] == 'POST' ||
+                        $_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'] == 'DELETE' ||
+                        $_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'] == 'PUT')
+                ) {
+                    header('Access-Control-Allow-Origin: *');
+                    header('Access-Control-Allow-Headers: X-Requested-With');
+                    header('Access-Control-Allow-Headers: Content-Type');
+                    header('Access-Control-Allow-Methods: POST, GET, OPTIONS, DELETE, PUT');
+                    header('Access-Control-Max-Age: 86400');
+                }
+                exit();
             } else {
                 header('Access-Control-Allow-Origin: *');
             }
@@ -118,14 +120,14 @@ class Restful
     }
 
     /**
-     * Method checkUrl
-     * Verifica url da requisição
+     * check Url request
+     *
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @param String $url
      * @throws EasyFastException
      * @return array
      */
-    private function checkUrl ($url)
+    private function checkUrl($url)
     {
         $url = array_filter(explode('/', $url));
         $queryString = array_filter(explode('/', isset($_GET['url']) ? $_GET['url'] : null));
@@ -151,10 +153,13 @@ class Restful
      * Method response
      * Return response in json, HTTP Status and exit system
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     * @param $response
+     * @param $httpStatus
+     * @param $break
      * @access public
      * @return string
      */
-    public static function response ($response, $httpStatus = null, $break = true)
+    public static function response($response, $httpStatus = null, $break = true)
     {
         if (!empty($httpStatus)) {
             header("HTTP/1.1 {$httpStatus}");

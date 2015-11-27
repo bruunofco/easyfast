@@ -16,6 +16,7 @@
  */
 
 namespace EasyFast\Common;
+
 use EasyFast\Exceptions\EasyFastException;
 
 /**
@@ -30,17 +31,21 @@ class Upload
 
     /**
      * Method __construct
-     * @param $_FILE $fileTmp $_FILE[]
-     * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     * @param array $fileTmp $_FILE[]
      * @access public
      */
-    public function __construct ($fileTmp)
+    public function __construct($fileTmp)
     {
         $this->file = $fileTmp;
         $this->extension();
     }
 
-    public function resizeImg ($width, $height)
+    /**
+     * @param $width
+     * @param $height
+     * @throws EasyFastException
+     */
+    public function resizeImg($width, $height)
     {
         $width  = intval($width);
         $height = intval($height);
@@ -90,7 +95,7 @@ class Upload
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access private
      */
-    private function extension ()
+    private function extension()
     {
         $this->extension = strtolower(end(explode('.', $this->file['name'])));
     }
@@ -101,7 +106,7 @@ class Upload
      * @param string $dir
      * @param null|string $name
      */
-    public function save ($dir, $name = null)
+    public function save($dir, $name = null)
     {
         if (is_null($name)) {
             $this->fileName = md5(uniqid(rand(), true)) . '.' . $this->extension;
@@ -118,5 +123,6 @@ class Upload
         }
 
         move_uploaded_file($this->file['tmp_name'], $dir . $this->fileName);
+        return $this->fileName;
     }
 }

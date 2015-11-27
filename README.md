@@ -46,3 +46,24 @@ The EasyFast PHP framework is an open-sourced software licensed under the [Apach
 > Mauro Fileto <mfileto@netcaster.us>
 
 #### Soon a fast start
+
+## Composer
+
+To install EasyFast PHP Framework with composer you simply need to create a composer.json in your project root and add:
+
+```json
+{
+    "require": {
+        "bruunofco/easyfast": "dev-master"
+    }
+}
+```
+
+Then run
+
+```bash
+$ wget -nc http://getcomposer.org/composer.phar
+$ php composer.phar install
+```
+
+You have now EasyFast PHP Framework installed in vendor/bruunofco/easyfast

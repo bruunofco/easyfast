@@ -20,6 +20,8 @@ namespace EasyFast\Config;
 include_once __DIR__ . '/../Common/Utils.class.php';
 include_once __DIR__ . '/../Exceptions/EasyFastException.class.php';
 
+use EasyFast\Route;
+use EasyFast\Common\Utils;
 use EasyFast\Exceptions\InvalidArgException;
 
 /**
@@ -29,20 +31,12 @@ use EasyFast\Exceptions\InvalidArgException;
  * @author Bruno Oliveira <bruno@salluzweb.com.br>
  * @version 1.1
  */
-trait Config
+class Config
 {
     /**
-     * Propriedades de configuração da aplicação
-     * @var string $appName        Nome da aplicação
-     * @var string $appUrl         URL da aplicação
-     * @var string $appSessionName Nome da sessão criada no sistema
-     * @var string $appDir         Diretório da aplicação
-     * @var string $appDirLog      Diretório de Logs
-     * @var string $appDirTpl      Diretório de Templates
-     * @var string $dirEasyFast    Diretório do EasyFast
-     * @access public
+     * @var object
      */
-    public static $appName, $appSessionName, $appUrl, $appDir, $appDirLog, $appDirTpl, $dirEasyFast, $appConfigs;
+    private static $configs;
 
     /**
      * @var array $dbConfigs
@@ -51,17 +45,11 @@ trait Config
     private static $dbConfigs;
 
     /**
-     * @var string $dbMain
-     * @access private
-     */
-    private static $dbMain;
-
-    /**
      * @var bool $routeDynamic
      * @access protected
      * Se for true irá instanciar método de rota dinamica automaticamente
      */
-    protected $routeDynamic = true;
+    protected $routeDynamic = false;
 
     /**
      * @var bool $sessionAutoStart
@@ -70,134 +58,116 @@ trait Config
      */
     protected $sessionAutoStart = true;
 
+    /**
+     * setConfigFile
+     * @param $file
+     * @param string $ext
+     */
+    public function setConfigFile($file, $ext = 'ini')
+    {
+        if ($ext == 'ini') {
+            $this->setConfigIni($file);
+        } elseif ($ext == 'xml') {
+            $this->setConfigXml($file);
+        }
+    }
+
+    /**
+     * setConfigIni
+     * @param $file
+     */
+    private function setConfigIni($file)
+    {
+        self::$configs = Utils::arrayToObject(parse_ini_file($file, true));
+    }
 
     /**
      * Method setConfig
      * Seta arquivo XMl ou Array de configuração e atribui configuração as variaveis
-     * @param string $config
+     * @param string $file
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
      */
-    public function setConfig ($config)
+    private function setConfigXml($file)
     {
         if (is_array($config)) {
             $this->config($config);
         } else {
             $config = simplexml_load_file($config);
             $this->config($config);
+            $this->setViewConfig($config);
         }
     }
 
     /**
-     * Method config
-     * Lê arquivo XML de configuração e atribui valores as propriedades
-     * @author Bruno Oliveira <bruno@salluzweb.com.br>
-     * @access private
-     * @param array $config Array com as configurações
+     * getConfig
+     * @return object
      */
-    private function config ($config)
+    public static function getConfig()
     {
-        static::$appSessionName = 'EasyFast';
-
-        static::$dirEasyFast = __DIR__ . '/../../';
-        $this->setDirApp($config->app->dir);
-        $this->setDirLog($config->app->dirLog);
-        $this->appUrl($config->app->url);
+        return self::$configs;
     }
 
     /**
-     * Method getConfig
-     * Obtêm as variaveis de configuração da aplicação
-     * @author Bruno Oliveira <bruno@salluzweb.com.br>
-     * @access public
+     * setConfigFileRoute
+     * @param $file
      */
-    public static function getConfig ()
+    public function setConfigFileRoute($file)
     {
-        return get_class_vars(get_class());
+        $route = new Route();
+        $route->setConfigFile($file);
     }
 
     /**
-     * Method setDirApp
-     * Seta diretório a aplicação
-     * @author Bruno Oliveira <bruno@salluzweb.com.br>
-     * @access public
-     * @param string $dir
+     * routeAutomatic
+     * @param bool|true $bool
      */
-    public function setDirApp ($dir)
+    public function routeAutomatic($bool = true)
     {
-        if (preg_match('/[\\\\|\/]$/', $dir)) {
-            static::$appDir = $dir;
-        } else {
-            static::$appDir = "$dir/";
-        }
+        self::$configs->App->RouteAutomatic = $bool;
     }
 
     /**
-     * Method setDirLog
-     * Seta diretório de log
+     * setDirApp
+     * Set directory Application
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
      * @param string $dir
      */
-    public function setDirLog ($dir)
+    public function setDir($dir)
     {
         if (preg_match('/[\\\\|\/]$/', $dir)) {
-            static::$appDirLog = $dir;
+            self::$configs->App->Dir = $dir;
         } else {
-            static::$appDirLog = "$dir/";
+            self::$configs->App->Dir = "$dir/";
         }
     }
 
     /**
-     * Method setUrl
-     * Seta url da aplicação ou retorna
-     * @author Bruno Oliveira <bruno@salluzweb.com.br>
-     * @access public
-     * @param string|null $url
-     */
-    public static function appUrl ($url = null)
-    {
-        if (is_null($url)) {
-            return static::$appUrl;
-        } else {
-            if (preg_match('/[\\\\|\/]$/', $url)) {
-                static::$appUrl = $url;
-            } else {
-                static::$appUrl = "$url/";
-            }
-        }
-    }
-
-    /**
-     * Method setSessionName
-     * Seta nome para sessão
+     * setSessionName
+     * Set name session
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @param string $name
      * @throws InvalidArgException
      */
-    public function setSessionName ($name)
+    public function setSessionName($name)
     {
-        if (!is_string($name)) {
-            throw new InvalidArgException('O nome da sessão deve ser uma string.');
-        }
-        static::$sessionName = $name;
+        self::$configs->App->SessioName = $name;
     }
 
     /**
-     * Method setDBConfig
-     * Seta configurações do banco de dados
+     * setConfigDataBase
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
-     * @param array|string $db Array de configuração ou caminho fisíco para arquivo de configuração
+     * @param string $name
+     * @param array $config
      * @throws InvalidArgException
      */
-    public function setDBConfig ($db)
+    public function setConfigDataBase($name, array $config)
     {
-        if (is_string($db)) {
-            static::$dbConfigs = parse_ini_file($db, true);
-        } elseif (is_array($db)) {
-            static::$dbConfigs = $db;
+        if (is_array($config)) {
+            self::$configs->DataBase->{$name} = (object)$config;
         } else {
-            throw new InvalidArgException('As configurações de banco de dados devem ser um array ou um arquivo de configuração.');
+            throw new InvalidArgException('Parameter is not an array');
         }
     }
 
@@ -205,42 +175,28 @@ trait Config
      * Method getDBCongig
      * Restaga configurações do banco de dados
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     * @param string|null $name
+     * @return object
      */
-    public static function getDBConfig ()
+    public static function getConfigDataBase($name = null)
     {
-        return self::$dbConfigs;
-    }
-
-    /**
-     * Method routeDynamic
-     * Atribui valor a $routeDynamic
-     * @author Bruno Oliveira <bruno@salluzweb.com.br>
-     * @param bool $arg
-     */
-    public function routeDynamic ($arg)
-    {
-        if (is_bool($arg)) {
-            $this->routeDynamic = $arg;
-        } else {
-            InvalidArgException('Parâmetro deve ser um boleano.');
+        if (is_null($name)) {
+            return self::$configs->DataBase;
         }
+        return self::$configs->DataBase->{$name};
     }
 
     /**
-     * Method appDirTpl
-     * Atribur valor a $appDirTpl ou se o parametro for null retornar o valor
+     * setDirTpl
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     * @param string $dir
      */
-    public static function appDirTpl ($dir = null)
+    public static function setDirTpl($dir)
     {
-        if (is_null($dir)) {
-            return self::$appDirTpl;
+        if (preg_match('/[\\\\|\/]$/', $dir)) {
+            self::$configs->View->DirTpl = $dir;
         } else {
-            if (preg_match('/[\\\\|\/]$/', $dir)) {
-                self::$appDirTpl = $dir;
-            } else {
-                self::$appDirTpl = $dir . '/';
-            }
+            self::$configs->View->DirTpl = $dir . '/';
         }
     }
 
@@ -250,48 +206,22 @@ trait Config
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
      */
-    public function sessionAutoStart ($bool)
+    public function sessionAutoStart($bool)
     {
         $this->sessionAutoStart = $bool;
     }
 
     /**
-     * Method dbMain
-     * informs or get the main application database
-     * @author Bruno Oliveira <bruno@salluzweb.com.br>
-     * @access public
-     * @return mixed
+     * Get WebHost Application
+     *
+     * @return string
      */
-    public static function dbMain ($db = null)
+    public static function getWebHost()
     {
-        if (is_null($db)) {
-            return self::$dbMain;
-        } else {
-            self::$dbMain = $db;
+        $webhost = self::getConfig()->App->WebHost;
+        if (preg_match('/[\\\\|\/]$/', $webhost)) {
+            return $webhost;
         }
-    }
-
-    /**
-     * Method setNewVarConfig
-     * set new var configuration
-     * @author Bruno Oliveira <bruno@salluzweb.com.br>
-     * @access public
-     * @return void
-     */
-    public static function setNewVarConfig ($config, $value)
-    {
-        self::$appConfigs[$config] = $value;
-    }
-
-    /**
-     * Method getVarConfig
-     * get var configuration
-     * @author Bruno Oliveira <bruno@salluzweb.com.br>
-     * @access public
-     * @return mixed
-     */
-    public static function getVarConfig ($config)
-    {
-        return self::$appConfigs[$config];
+        return "$webhost/";
     }
 }

@@ -51,7 +51,7 @@ abstract class Model
      * @access public
      * @throws EasyFastException
      */
-    public function __construct ($param1 = null, $param2 = null)
+    public function __construct($param1 = null, $param2 = null)
     {
         $conn = self::conn();
         $conn->cleanQuery();
@@ -73,16 +73,16 @@ abstract class Model
                     $this->$methodProp($val);
                 }
             } else {
-                throw new EasyFastException('Não existe nenhum registro em \'' . self::getTable() . '\' com \'' . self::getPrimaryKey($conn)  . '\' = \'' . $param1 . '\'');
+                throw new EasyFastException('Não existe nenhum registro em \'' . self::getTable() . '\' com \'' . self::getPrimaryKey($conn) . '\' = \'' . $param1 . '\'');
             }
 
             self::$result = $this;
         }
     }
-    
-    public function __destruct ()
+
+    public function __destruct()
     {
-        self::$conn = null;    
+        self::$conn = null;
     }
 
     /**
@@ -91,7 +91,7 @@ abstract class Model
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access protected
      */
-    public static function conn ($dataBase = null)
+    public static function conn($dataBase = null)
     {
         if (empty(self::$conn)) {
             self::$conn = new Connection($dataBase);
@@ -107,7 +107,7 @@ abstract class Model
      * @access private
      * @return string
      */
-    private static function getTable ()
+    private static function getTable()
     {
         $class = get_called_class();
         if (defined("{$class}::TABLE_NAME")) {
@@ -125,7 +125,7 @@ abstract class Model
      * @access private
      * @return string
      */
-    private static function getPrimaryKey ()
+    private static function getPrimaryKey()
     {
         $class = get_called_class();
         $sth = self::conn()->query('SHOW KEYS FROM ' . self::getTable() . " WHERE Key_name = 'PRIMARY'");
@@ -140,7 +140,7 @@ abstract class Model
      * @access public
      * @return string
      */
-    public static function getLastId ()
+    public static function getLastId()
     {
         $conn = self::conn();
         $conn->col("max(" . self::getPrimaryKey() . ") as id");
@@ -154,7 +154,7 @@ abstract class Model
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @return string
      */
-    public static function count ()
+    public static function count()
     {
         $conn = self::conn();
         $sth = $conn->query("SELECT COUNT(*) as count FROM " . self::getTable() . ' ' . $conn->getWhere());
@@ -168,14 +168,10 @@ abstract class Model
      * @access public
      * @return Model
      */
-    public function where ($column, $operator, $value = null, $opLogic = Connection::_AND)
+    public function where($column, $operator, $value = null, $opLogic = Connection::_AND)
     {
         $conn = self::conn();
         $conn->where($column, $operator, $value, $opLogic);
-
-        // Retorna objeto
-//        $class = get_called_class();
-//        return new $class;
     }
 
     /**
@@ -185,7 +181,7 @@ abstract class Model
      * @access public
      * @return Model
      */
-    public static function orWhere ($call)
+    public static function orWhere($call)
     {
         $conn = self::conn();
         $conn->orWhere($call);
@@ -202,14 +198,10 @@ abstract class Model
      * @access public
      * @return Model
      */
-    public static function andWhere ($call)
+    public static function andWhere($call)
     {
         $conn = self::conn();
         $conn->andWhere($call);
-
-        // Retorna objeto
-//        $class = get_called_class();
-//        return new $class;
     }
 
     /**
@@ -220,7 +212,7 @@ abstract class Model
      * @param string $col
      * @return $this
      */
-    public function col ($col)
+    public function col($col)
     {
         self::conn()->col($col);
     }
@@ -253,7 +245,7 @@ abstract class Model
      * @access public
      * @return array
      */
-    public function toArray ()
+    public function toArray()
     {
         if (empty(self::$result)) {
             return get_object_vars($this);
@@ -267,7 +259,7 @@ abstract class Model
                     $array[] = get_object_vars($r);
                 }
                 return $array;
-            }    
+            }
         }
     }
 
@@ -278,10 +270,10 @@ abstract class Model
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
      * @param int $pk
-     * @return object
+     * @return object|array
      * @throws EasyFastException
      */
-    public static function find ($pk = null)
+    public static function find($pk = null)
     {
         $conn = self::conn();
         $conn->table(self::getTable());
@@ -294,7 +286,7 @@ abstract class Model
             $result = $conn->select();
 
             $nameClass = get_called_class();
-            $instance  = new $nameClass;
+            $instance = new $nameClass;
 
             if (isset($result[0])) {
                 foreach ($result[0] as $key => $val) {
@@ -302,7 +294,7 @@ abstract class Model
                     $instance->$methodProp($val);
                 }
             } else {
-                throw new EasyFastException('Não existe nenhum registro em \'' . self::getTable() . '\' com \'' . self::getPrimaryKey($conn)  . '\' = \'' . $pk . '\'');
+                throw new EasyFastException('Não existe nenhum registro em \'' . self::getTable() . '\' com \'' . self::getPrimaryKey($conn) . '\' = \'' . $pk . '\'');
             }
 
             self::$result = $instance;
@@ -310,7 +302,7 @@ abstract class Model
             $result = $conn->select();
 
             $nameClass = get_called_class();
-            $instance  = array();
+            $instance = array();
 
             if (isset($result[0])) {
                 foreach ($result as $k => $r) {
@@ -339,25 +331,25 @@ abstract class Model
      * @access public
      * @return array
      */
-    public static function all ()
+    public static function all()
     {
-        $conn   = self::conn();
-        $sth    = $conn->query("SELECT * FROM " . self::getTable());
+        $conn = self::conn();
+        $sth = $conn->query("SELECT * FROM " . self::getTable());
         $result = $sth->fetchAll(PDO::FETCH_ASSOC);
 
         $object = array();
 
         foreach ($result as $r) {
 
-                $nameClass = get_called_class();
-                $instance  = new $nameClass;
+            $nameClass = get_called_class();
+            $instance = new $nameClass;
 
-                foreach ($r as $key => $val) {
-                    $methodProp = 'set' . Utils::snakeToCamelCase($key);
-                    $instance->$methodProp($val);
-                }
+            foreach ($r as $key => $val) {
+                $methodProp = 'set' . Utils::snakeToCamelCase($key);
+                $instance->$methodProp($val);
+            }
 
-                array_push($object, $instance);
+            array_push($object, $instance);
         }
 
         self::$result = $object;
@@ -371,7 +363,7 @@ abstract class Model
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @return string Id da inserção
      */
-    public function save ()
+    public function save()
     {
         $class = get_class($this);
         $class = explode('\\', $class);
@@ -379,8 +371,8 @@ abstract class Model
 
         $r = new ReflectionClass($class);
 
-        $vars      = get_object_vars($this);
-        $varsDB    = array();
+        $vars = get_object_vars($this);
+        $varsDB = array();
 
         foreach ($vars as $key => $val) {
             if ($r->hasProperty($key)) {
@@ -404,7 +396,7 @@ abstract class Model
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @return bool
      */
-    public function delete ()
+    public function delete()
     {
         $primaryKey = $this->getPrimaryKey();
         $conn = $this->conn();
@@ -426,17 +418,17 @@ abstract class Model
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @return bool
      */
-    public function update ()
+    public function update()
     {
         $primaryKey = $this->getPrimaryKey();
-        $class      = get_class($this);
-        $class      = explode('\\', $class);
-        $class      = "$class[0]\\Traits\\Trait$class[1]";
+        $class = get_class($this);
+        $class = explode('\\', $class);
+        $class = "$class[0]\\Traits\\Trait$class[1]";
 
         $r = new ReflectionClass($class);
 
-        $vars      = get_object_vars($this);
-        $varsDB    = array();
+        $vars = get_object_vars($this);
+        $varsDB = array();
 
         foreach ($vars as $key => $val) {
             if (($r->hasProperty($key) && isset($val)) && $key != $primaryKey) {
@@ -460,16 +452,16 @@ abstract class Model
      * Executa com um select
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      */
-    public function select ()
+    public function select()
     {
         $conn = self::conn();
         $conn->table($this->getTable());
-		self::$result = $conn->select();
+        self::$result = $conn->select();
 
-		if (empty(self::$result)) {
-			throw new EasyFastException('Não foi encontrado nenhum registro em \'' . self::getTable() . '\'');			
-		}	
-        
+        if (empty(self::$result)) {
+            throw new EasyFastException('Não foi encontrado nenhum registro em \'' . self::getTable() . '\'');
+        }
+
         self::$result = $conn->select();
         self::$conn = null;
 

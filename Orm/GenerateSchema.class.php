@@ -38,17 +38,25 @@ trait GenerateSchema
     private $fileName;
 
     /**
+     * @var array Values do not set as default
+     */
+    private $noValueDefault = array(
+        'CURRENT_TIMESTAMP'
+    );
+
+    /**
      * Method __construct
      * Executa script SQL para resgatar informações sobre o banco de dados
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @param $db
      * @throws EasyFastException
+     * @return mixed
      */
     public function createSchema ($db = null)
     {
         $this->conn = new Connection($db);
         $stmt =  $this->conn->query("SELECT TABLE_NAME, COLUMN_NAME, TABLE_SCHEMA, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH,
-                                     IS_NULLABLE, COLUMN_KEY, EXTRA
+                                     IS_NULLABLE, COLUMN_KEY, COLUMN_DEFAULT, EXTRA
                                      FROM information_schema.COLUMNS
                                      WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME IN
                                      (SELECT TABLE_NAME FROM information_schema.TABLES T WHERE TABLE_SCHEMA = DATABASE())");
@@ -68,6 +76,7 @@ trait GenerateSchema
                 $this->tablesElement = $dataBase->appendChild($this->tablesElement);
                 $this->tablesElement->appendChild($this->attrNameTable);
                 $this->generateForeign($row->TABLE_NAME);
+                $this->generateChild($row->TABLE_NAME);
             }
             $column = $this->xml->createElement('column');
             $attrName = $this->xml->createAttribute('name', $row->COLUMN_NAME);
@@ -75,6 +84,10 @@ trait GenerateSchema
             $column = $this->tablesElement->appendChild($column);
             $column->appendChild($attrName);
             $column->appendChild($attrType);
+            if (!empty($row->COLUMN_DEFAULT) && !in_array($row->COLUMN_DEFAULT, $this->noValueDefault)) {
+                $valueDefault = $this->xml->createAttribute('valueDefault', $row->COLUMN_DEFAULT);
+                $column->appendChild($valueDefault);
+            }
             if (isset($row->CHARACTER_MAXIMUM_LENGTH)) {
                 $attrLimit = $this->xml->createAttribute('size', $row->CHARACTER_MAXIMUM_LENGTH);
                 $column->appendChild($attrLimit);
@@ -128,6 +141,49 @@ trait GenerateSchema
                 $foreignKey = $this->tablesElement->appendChild($foreignKey);
                 $foreignKey->appendChild($attrForeignTable);
                 $reference = $foreignKey->appendChild($reference);
+                $reference->appendChild($attrReferenceLocal);
+                $reference->appendChild($attrReferenceForeign);
+                $reference->appendChild($attrLazyLoad);
+            }
+        }
+    }
+
+    /**
+     * Method generateChilds
+     * Resgata as chaves estrangeiras
+     * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     * @param $table
+     */
+    private function generateChild ($table)
+    {
+        $stmt2 =  $this->conn->query("SELECT
+                                            i.TABLE_NAME,
+                                            i.CONSTRAINT_TYPE,
+                                            i.CONSTRAINT_NAME,
+                                            k.REFERENCED_TABLE_NAME,
+                                            k.REFERENCED_COLUMN_NAME,
+                                            k.COLUMN_NAME
+                                        FROM
+                                            information_schema.TABLE_CONSTRAINTS i
+                                                LEFT JOIN
+                                            information_schema.KEY_COLUMN_USAGE k ON i.CONSTRAINT_NAME = k.CONSTRAINT_NAME
+                                        WHERE
+                                            i.CONSTRAINT_TYPE = 'FOREIGN KEY'
+                                                AND k.REFERENCED_TABLE_NAME = '{$table}'
+                                                AND i.TABLE_SCHEMA = DATABASE() GROUP BY i.TABLE_NAME;");
+
+        if ($stmt2->rowCount()) {
+            while ($row2 = $stmt2->fetchObject()) {
+                $child = $this->xml->createElement('child');
+                $attrForeignTable = $this->xml->createAttribute('foreignTable', $row2->TABLE_NAME);
+                $reference = $this->xml->createElement('reference');
+                $attrReferenceLocal = $this->xml->createAttribute('local', $row2->COLUMN_NAME);
+                $attrReferenceForeign = $this->xml->createAttribute('foreign', $row2->REFERENCED_COLUMN_NAME);
+                $attrLazyLoad = $this->xml->createAttribute('lazyLoad', 'true');
+
+                $child = $this->tablesElement->appendChild($child);
+                $child->appendChild($attrForeignTable);
+                $reference = $child->appendChild($reference);
                 $reference->appendChild($attrReferenceLocal);
                 $reference->appendChild($attrReferenceForeign);
                 $reference->appendChild($attrLazyLoad);

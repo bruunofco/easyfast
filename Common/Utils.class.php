@@ -242,10 +242,6 @@ trait Utils
         $arguments  = array();
         $refle      = new ReflectionMethod($class, $method);
 
-        if (count($refle->getParameters()) && !count((array) $args)) {
-            throw new EasyFastException('It is mandatory to pass parameters.');
-        }
-
         foreach ($refle->getParameters() as $arg) {
             if (isset($args[$arg->name])) {
                 $arguments[$arg->name] = $args[$arg->name];
@@ -261,7 +257,7 @@ trait Utils
         }
 
         call_user_func_array(array($class, $method), $arguments);
-        die;
+        exit();
     }
 
     /**
@@ -276,7 +272,7 @@ trait Utils
         $maskared = '';
         $k = 0;
         for ($i = 0; $i <= strlen($mask)-1; $i++) {
-            if($mask[$i] == '#') {
+            if ($mask[$i] == '#') {
                 if (isset($val[$k])) {
                     $maskared .= $val[$k++];
                 }
@@ -288,5 +284,48 @@ trait Utils
         }
 
         return $maskared;
+    }
+    
+    /**
+     * getGUID
+     * Return GUID
+     * @author Bruno Oliveira <bruno.oliveira@riosoft.com.br>
+     * @return string
+     */
+    public static function getGUID ()
+    {
+        if (function_exists('com_create_guid')) {
+            return com_create_guid();
+        } else {
+            mt_srand((double) microtime() * 10000);
+            $charid = strtoupper(md5(uniqid(rand(), true)));
+            $hyphen = '-';
+            return substr($charid, 0, 8).$hyphen
+                   .substr($charid, 8, 4).$hyphen
+                   .substr($charid,12, 4).$hyphen
+                   .substr($charid,16, 4).$hyphen
+                   .substr($charid,20,12);
+        }
+    }
+
+    /**
+     * arrayToObject
+     * @param $array
+     * @param $object
+     * @return \stdClass
+     */
+    public static function arrayToObject($array, $object = '\stdClass')
+    {
+        $obj = new $object;
+        foreach ($array as $k => $v) {
+            if (strlen($k)) {
+                if (is_array($v)) {
+                    $obj->{$k} = self::arrayToObject($v);
+                } else {
+                    $obj->{$k} = $v;
+                }
+            }
+        }
+        return $obj;
     }
 }

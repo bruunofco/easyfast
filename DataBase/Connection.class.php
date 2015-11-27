@@ -222,7 +222,7 @@ class Connection
         try {
             return $this->conn->exec($sql);
         } catch (PDOException $e) {
-            throw new DBException($e->getMessage());
+            throw new DBException($e->getMessage(), (int)$e->getCode(), $sql);
         }
     }
 

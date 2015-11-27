@@ -36,10 +36,20 @@ class Session
     public function __construct ()
     {
         try {
-            self::sessionStatus();
+            $this->start();
+        } catch (EasyFastException $e) {}
+    }
+
+    /**
+     * start
+     * Start sesssion
+     */
+    public static function start()
+    {
+        if (session_status() != PHP_SESSION_ACTIVE) {
             ob_start();
             session_start();
-        } catch (EasyFastException $e) {}
+        }
     }
 
     /**
@@ -48,11 +58,17 @@ class Session
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @param string $var
      * @param $value
+     * @param bool|null $serialize
      */
-    public static function set ($var, $value)
+    public static function set ($var, $value, $serialize = false)
     {
         self::sessionStatus();
-        $_SESSION[$var] = $value;
+        if ($serialize) {
+            $_SESSION[$var] = serialize($value);
+        } else {
+            $_SESSION[$var] = $value;
+        }
+
     }
 
     /**
@@ -60,14 +76,20 @@ class Session
      * Resgata valor da sessão
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @param string|null $var
+     * @param bool|null $unserialize
      * @throws EasyFastException
-     * @return string|array
+     * @return string|array|object
      */
-    public static function get ($var = null)
+    public static function get ($var = null, $unserialize = false)
     {
+        self::start();
         self::sessionStatus();
         if (isset($_SESSION[$var])) {
-            return $_SESSION[$var];
+            if ($unserialize) {
+                return unserialize($_SESSION[$var]);
+            } else {
+                return $_SESSION[$var];
+            }
         } elseif (is_null($var)) {
             return $_SESSION;
         } else {
@@ -100,13 +122,13 @@ class Session
     public static function sessionStatus ()
     {
         switch (session_status()) {
-            case 'PHP_SESSION_NONE':
+            case PHP_SESSION_NONE:
                 throw new EasyFastException('Sessão não foi iniciada.');
                 break;
-            case 'PHP_SESSION_DISABLED':
+            case PHP_SESSION_DISABLED:
                 throw new EasyFastException('Sessão desativada.');
                 break;
-            case 'PHP_SESSION_ACTIVE':
+            case PHP_SESSION_ACTIVE:
                 return true;
                 break;
         }
