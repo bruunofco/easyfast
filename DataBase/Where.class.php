@@ -72,6 +72,24 @@ trait WHERE
     }
 
     /**
+     * Method whereColumn
+     * Create comparison columns
+     * @author Hiago Silva Souza <hiago@sparkweb.com.br>
+     * @access public
+     * @param string $column
+     * @param string $operator
+     * @param string $value
+     * @param string|null $opLogic
+     * @return WHERE
+     */
+    public function whereColumn ($columna, $operator, $columnb, $opLogic = Connection::_AND)
+    {
+        $this->where .= "{$columna} {$operator} {$columnb} {$opLogic}";
+        $this->wherePrepare($columna, $operator, $columnb, $opLogic); 
+        return $this;
+    }
+
+    /**
      * Method wherePrepare
      * Prepare comparison string
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
