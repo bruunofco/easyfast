@@ -90,6 +90,7 @@ abstract class WebSocket
 
     /**
      * onClose
+     *
      * @param $client
      * @return mixed
      */
