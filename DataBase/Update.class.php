@@ -22,7 +22,7 @@ use EasyFast\Exceptions\DBException;
 
 /**
  * Class Update
- * Abstrai a escrita de código SQL para executar UPDATE
+ * Create and manage the SQL command for UPDATE
  * @package EasyFast\DataBase
  * @author Bruno Oliveira <bruno@salluzweb.com.br>
  */
@@ -31,9 +31,10 @@ trait Update
 
     /**
      * Method update
-     * Cria e executa script para UPDATE
+     * Create and execute UPDATE using PDO
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
+     * @throws DBException
      */
     public function update ($rowData = null)
     {

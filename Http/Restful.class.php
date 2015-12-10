@@ -67,7 +67,7 @@ class Restful
                     if (empty($data)) {
                         $data = new StdClass();
                     }
-
+                    
                     foreach ($this->queryString as $key => $val) {
                         $data->$key = $val;
                     }
@@ -97,7 +97,7 @@ class Restful
      * @access public
      * @param bool $bool
      */
-    public function crossOrigin($bool)
+    public static function crossOrigin($bool, $keys = null)
     {
         if ($bool) {
             if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
@@ -106,13 +106,16 @@ class Restful
                         $_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'] == 'DELETE' ||
                         $_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'] == 'PUT')
                 ) {
+                    $sKeys = 'Origin, X-Requested-With, Content-Type, Accept';
+                    if (!is_null($keys)) {
+                        $sKeys .= ', ' . $keys;
+                    }
                     header('Access-Control-Allow-Origin: *');
-                    header('Access-Control-Allow-Headers: X-Requested-With');
-                    header('Access-Control-Allow-Headers: Content-Type');
+                    header("Access-Control-Allow-Headers: $sKeys");
                     header('Access-Control-Allow-Methods: POST, GET, OPTIONS, DELETE, PUT');
                     header('Access-Control-Max-Age: 86400');
                 }
-                exit();
+                exit;
             } else {
                 header('Access-Control-Allow-Origin: *');
             }

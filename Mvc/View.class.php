@@ -17,9 +17,10 @@
 
 namespace EasyFast\Mvc;
 
-require(__DIR__ . '/../Libs/smarty/libs/Smarty.class.php');
+require __DIR__ . '/../Libs/smarty/libs/Smarty.class.php';
+require __DIR__ . '/../Libs/smarty/libs/SmartyBC.class.php';
 
-use Smarty;
+use SmartyBC;
 use EasyFast\App;
 
 /**
@@ -27,7 +28,7 @@ use EasyFast\App;
  * Gera visualização
  * @author Bruno Oliveira <bruno@salluzweb.com.br
  */
-class View extends Smarty
+class View extends SmartyBC
 {
     /**
      * @var Armazena diretório de templates

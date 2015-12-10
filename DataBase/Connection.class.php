@@ -19,15 +19,15 @@ namespace EasyFast\DataBase;
 
 use PDO;
 use PDOException;
+use PDOStatement;
 use EasyFast\App;
 use EasyFast\Exceptions\DBException;
 
 /**
  * Class Connection
- * Gerenciador de banco de dados
- * @package EasyFast\DataBase
+ * DataBase Manager
  * @author Bruno Oliveira <bruno@salluzweb.com.br>
- * @version 1.2
+ * @package EasyFast\DataBase
  */
 class Connection
 {
@@ -36,10 +36,10 @@ class Connection
 
     /**
      * Traits
-     * CommunCrud   - Métodos e propriêdades genericos
-     * Insert       - Métodos para INSERT
-     * Delete       - Métodos para DELETE
-     * Update       - Métodos para UPDATE
+     * CommunCrud   - Generic Methods and properties
+     * Insert       - INSERT Methods
+     * Delete       - DELETE Methods
+     * Update       - UPDATE Methods
      */
     use CommonCrud;
     use Insert;
@@ -48,7 +48,7 @@ class Connection
     use Select;
 
     /**
-     * @var PDO Armagena conexão com o banco de dados
+     * @var PDO Stores the database connection
      * @access public
      */
     public $conn;
@@ -76,8 +76,9 @@ class Connection
 
     /**
      * Method open
-     * Abre uma conexão com o banco de dados
+     * Open a new connection with the database
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     * @access public
      * @param array $db
      * @throws DBException
      * @return PDO
@@ -85,10 +86,10 @@ class Connection
     public function open ($db)
     {
         if (!is_array($db)) {
-            throw new DBException('Configurações de banco de dados inválido.');
+            throw new DBException('Invalid configuration for Database');
         }
 
-        //Atribui os valores as váriaveis
+        //Set Values
         $userName   = isset($db['UserName'])    ? $db['UserName']   : null;
         $password   = isset($db['Password'])    ? $db['Password']   : null;
         $dbName     = isset($db['DBName'])      ? $db['DBName']     : null;
@@ -96,7 +97,7 @@ class Connection
         $drive      = isset($db['Drive'])       ? $db['Drive']      : null;
         $port       = isset($db['Port'])        ? $db['Port']       : null;
 
-        //Obtêm o drive do banco de dados
+        //Get the correct drive for each database
         switch ($drive) {
             case 'pgsql':
                 $port  = is_null($port) ? '5432' : $port;
@@ -150,9 +151,9 @@ class Connection
                 break;
         }
 
-        //Define para que o PDO lance exceções na ocorrência de erros
+        //Set PDO to throw Exceptions for errors
         $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        //Define que o retorno do PDO seja sempre em objetos
+        //Set PDO to always return objects
         $this->conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
 
 		return $this->conn;
@@ -160,7 +161,7 @@ class Connection
 
     /**
      * Method beginTransaction
-     * Inicia uma transação
+     * Starts a transaction
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
      * @throws DBException
@@ -176,7 +177,7 @@ class Connection
 
     /**
      * Method commit
-     * Confirma transação e fecha a conexão com o banco de dados
+     * Commit a open transaction and close the connection with database
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
      * @throws DBException
@@ -193,7 +194,7 @@ class Connection
 
     /**
      * Method rollback
-     * Cancela transação e fecha a conexão com o banco de dados
+     * Cancel (rollback) a open transaction and close the connection with database
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
      * @throws DBException
@@ -210,7 +211,7 @@ class Connection
 
     /**
      * Method exec
-     * Executa script sql
+     * Performs a SQL script
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
      * @return int
@@ -228,12 +229,12 @@ class Connection
 
     /**
      * Method query
-     * Executa instrução SQL retornando um conjunto de objeto PDOStatement
+     * Performs a SQL instruction and return objectos of type PDOStatement
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
      * @param string $sql
      * @throws DBException
-     * @return \PDOStatement
+     * @return PDOStatement
      */
     public function query ($sql)
     {
@@ -246,12 +247,12 @@ class Connection
 
     /**
      * Method prepare
-     * Prepara um sql statement para execução e retorna um objeto de declaração
+     * Prepare a SQL Statement for execution and return a PDOStatement
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
-     * @param string $sql
      * @access public
+     * @param string $sql
      * @throws DBException
-     * @return \PDOStatement
+     * @return PDOStatement
      */
     public function prepare ($sql)
     {
@@ -264,8 +265,9 @@ class Connection
 
     /**
      * Method quote
-     * Escapa caractres especiais
+     * Escape special characters
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     * @access public
      * @param string $str
      * @param int $paramType
      * @return string
@@ -277,11 +279,11 @@ class Connection
 
     /**
      * Method lastInsertId
-     * Retorna o ID dá ultima linha inserida ou valor de sequência
+     * Returns the ID of last inserted line
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     * @access public
      * @param string $name
      * @return int
-     * @access public
      */
     public function lastInsertId ($name = null)
     {
@@ -290,20 +292,26 @@ class Connection
 
     /**
      * Method inTransaction
-     * Verifica se existe transação ativa
+     * Checks for active transaction
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
+     * @return boolean
      */
     public function inTransaction ()
     {
+    	if(is_null($this->conn)) {
+            return false;
+        }
+        
         return $this->conn->inTransaction();
     }
 
     /**
      * Method getAvailableDrivers
-     * Retorna um array de drivers PDO disponíveis
+     * Returns a array with available PDO drivers
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
+     * @return array
      */
     public function getAvailableDrivers ()
     {

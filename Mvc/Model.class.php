@@ -51,7 +51,7 @@ abstract class Model
      * @access public
      * @throws EasyFastException
      */
-    public function __construct($param1 = null, $param2 = null)
+    public function __construct ($param1 = null, $param2 = null)
     {
         $conn = self::conn();
         $conn->cleanQuery();
@@ -73,16 +73,18 @@ abstract class Model
                     $this->$methodProp($val);
                 }
             } else {
-                throw new EasyFastException('Não existe nenhum registro em \'' . self::getTable() . '\' com \'' . self::getPrimaryKey($conn) . '\' = \'' . $param1 . '\'');
+                throw new EasyFastException('Não existe nenhum registro em \'' . self::getTable() . '\' com \'' . self::getPrimaryKey($conn)  . '\' = \'' . $param1 . '\'');
             }
 
             self::$result = $this;
         }
     }
-
-    public function __destruct()
+    
+    public function __destruct ()
     {
-        self::$conn = null;
+    	if(!is_null(self::$conn) && !self::$conn->inTransaction()) {
+        	self::$conn = null;
+    	}
     }
 
     /**
@@ -134,6 +136,18 @@ abstract class Model
     }
 
     /**
+     * Method getPrimaryKeys
+     * get the primary key in a vector (useful in composite keys)
+     * @author Hiago Souza <hiago@sparkweb.com.br>
+     * @access private
+     * @return array|null
+     */
+    private static function getPrimaryKeys() {
+        $class = get_called_class();
+        $sth = self::conn()->query('SHOW KEYS FROM ' . self::getTable() . " WHERE Key_name = 'PRIMARY'");
+        $result = $sth->fetchAll();
+
+    /**
      * Method getLastId
      * Retorna o ultimo Id da primeira Primary Key
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
@@ -172,6 +186,10 @@ abstract class Model
     {
         $conn = self::conn();
         $conn->where($column, $operator, $value, $opLogic);
+
+        // Retorna objeto
+//        $class = get_called_class();
+//        return new $class;
     }
 
     /**
@@ -202,6 +220,10 @@ abstract class Model
     {
         $conn = self::conn();
         $conn->andWhere($call);
+
+        // Retorna objeto
+//        $class = get_called_class();
+//        return new $class;
     }
 
     /**
@@ -259,7 +281,7 @@ abstract class Model
                     $array[] = get_object_vars($r);
                 }
                 return $array;
-            }
+            }    
         }
     }
 
@@ -319,7 +341,9 @@ abstract class Model
             self::$result = $instance;
         }
 
-        self::$conn = null;
+        if(!is_null(self::$conn) && !self::$conn->inTransaction()) {
+            self::$conn = null;
+        }
 
         return $instance;
     }
@@ -398,14 +422,16 @@ abstract class Model
      */
     public function delete()
     {
-        $primaryKey = $this->getPrimaryKey();
+        $primaryKeys = $this->getPrimaryKeys();
         $conn = $this->conn();
         $conn->table($this->getTable());
         $vars = get_object_vars($this);
 
         foreach ($vars as $k => $v) {
             if (!is_null($v) || $v != '') {
-                $conn->where(Utils::camelToSnakeCase($k), $v);
+            	if(in_array($k,$primaryKeys)) {
+                	$conn->where(Utils::camelToSnakeCase($k), $v);
+            	}
             }
         }
 
@@ -431,7 +457,7 @@ abstract class Model
         $varsDB = array();
 
         foreach ($vars as $key => $val) {
-            if (($r->hasProperty($key) && isset($val)) && $key != $primaryKey) {
+            if (($r->hasProperty($key) && isset($val)) && !in_array(Utils::camelToSnakeCase($key),$primaryKeys)) {
                 $varsDB[Utils::camelToSnakeCase($key)] = $val;
             }
         }
@@ -439,8 +465,13 @@ abstract class Model
         $conn = self::conn();
         $conn->table($this->getTable());
 
-        if (!is_null($primaryKey) && isset($vars[lcfirst(Utils::snakeToCamelCase($primaryKey))])) {
-            $conn->where($primaryKey, $vars[lcfirst(Utils::snakeToCamelCase($primaryKey))]);
+        if (!empty($primaryKeys)) {
+            foreach ($primaryKeys as $primary) {
+                if (!is_null($primary)) {
+                    $snake = lcfirst(Utils::snakeToCamelCase($primary));
+                    $conn->where($primary,'=',$vars[$snake]);
+                }
+            }
         }
 
         $conn->update($varsDB);
@@ -463,7 +494,10 @@ abstract class Model
         }
 
         self::$result = $conn->select();
-        self::$conn = null;
+
+	if(!is_null(self::$conn) && !$conn->inTransaction()) {
+            self::$conn = null;
+        }
 
         return self::$result;
     }

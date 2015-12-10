@@ -28,25 +28,6 @@ Try EasyFast PHP and share your experience. We love feedback!
 ## Documentation
 We are still developing the documentation, help us!
 
-## Contributing
-Still under development, we are accepting collaboration in order to create a successful tool, created on top of this passionate language PHP.
-
-## License
-The EasyFast PHP framework is an open-sourced software licensed under the [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0)
-
-## About
-**Author**: Bruno Oliveira <bruno@salluzweb.com.br>
-
-**Contributors**: 
-
-> James Miranda <jameswpm@gmail.com>
-
-> Hiago Souza <hiago@sparkweb.com.br>
-
-> Mauro Fileto <mfileto@netcaster.us>
-
-#### Soon a fast start
-
 ## Composer
 
 To install EasyFast PHP Framework with composer you simply need to create a composer.json in your project root and add:
@@ -67,3 +48,25 @@ $ php composer.phar install
 ```
 
 You have now EasyFast PHP Framework installed in vendor/bruunofco/easyfast
+
+## Contributing
+Still under development, we are accepting collaboration in order to create a successful tool, created on top of this passionate language PHP.
+
+## License
+The EasyFast PHP framework is an open-sourced software licensed under the [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0)
+
+## About
+**Author**: Bruno Oliveira <bruno@salluzweb.com.br>
+
+**Contributors**: 
+
+> James Miranda <jameswpm@gmail.com>
+
+> Hiago Souza <hiago@sparkweb.com.br>
+
+> Mauro Fileto <mfileto@netcaster.us>
+
+#### Soon a fast start
+
+## Credits
+[Smarty: Template Engine](https://github.com/smarty-php/smarty)

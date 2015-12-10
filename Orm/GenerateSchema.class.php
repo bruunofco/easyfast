@@ -82,6 +82,10 @@ trait GenerateSchema
             $attrName = $this->xml->createAttribute('name', $row->COLUMN_NAME);
             $attrType = $this->xml->createAttribute('type', $row->DATA_TYPE);
             $column = $this->tablesElement->appendChild($column);
+            if (!empty($row->COLUMN_DEFAULT) && !in_array($row->COLUMN_DEFAULT, $this->noValueDefault)) {
+                $valueDefault = $this->xml->createAttribute('valueDefault', $row->COLUMN_DEFAULT);
+                $column->appendChild($valueDefault);
+            }
             $column->appendChild($attrName);
             $column->appendChild($attrType);
             if (!empty($row->COLUMN_DEFAULT) && !in_array($row->COLUMN_DEFAULT, $this->noValueDefault)) {

@@ -10,6 +10,20 @@
         }
     ],
     "minimum-stability": "dev",
+    "keywords": 
+        [
+            "php", 
+            "easyfast", 
+            "framework", 
+            "easyfast php", 
+            "orm", 
+            "restful", 
+            "query object", 
+            "mvc", 
+            "soap", 
+            "generator", 
+            "smarty"
+        ],
     "require": {
         "php": ">=5.5.3" 
     }

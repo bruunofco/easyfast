@@ -103,6 +103,7 @@ class App extends Config
      */
     public function execMethodBeforeRunApp ($class, $method, $params = array())
     {
+        //Registra AutoLoader
         spl_autoload_register(array($this, 'loader'));
 
         if (!is_object($class)) {
@@ -111,4 +112,5 @@ class App extends Config
 
         call_user_func_array(array($class, $method), $params);
     }
+
 }
