@@ -82,6 +82,7 @@ abstract class WebSocket
 
     /**
      * onMessage
+     *
      * @param $client
      * @param $message
      * @return mixed
