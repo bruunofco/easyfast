@@ -11,7 +11,7 @@ class WebSocket_Test extends EasyFast\Http\WebSocket
 
     public function onMessage($client, $message)
     {
-        $this->sendMessage('Oii resposta.', $client);
+        $this->sendMessage('Oii respostas.', $client);
     }
 
     public function onClose($client)
