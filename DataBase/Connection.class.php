@@ -299,6 +299,10 @@ class Connection
      */
     public function inTransaction ()
     {
+    	if(is_null($this->conn)) {
+            return false;
+        }
+        
         return $this->conn->inTransaction();
     }
 
