@@ -55,7 +55,7 @@ class App extends Config
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @return void
      */
-    public function run ()
+    public function run()
     {
         spl_autoload_register(array($this, 'loader'));
         if ($this->sessionAutoStart) {
@@ -73,7 +73,7 @@ class App extends Config
      * @return void
      * @throws EasyFastException
      */
-    private function loader ($fileName)
+    private function loader($fileName)
     {
         $fileCheck = explode('\\', $fileName);
 

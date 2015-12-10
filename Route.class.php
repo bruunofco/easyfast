@@ -85,8 +85,46 @@ class Route extends RouteParent
                 $route = $this->getRoute('Default')->go('notfound');
                 $this->location($this->getRoute('Default', 'notfound')['url']);
             }
-
         }
+
+        // if (!isset($_GET['url'])) {
+        //     $index = isset(self::$route['index']) ? self::$route['index'] : null;
+        //     $this->routeLocation($index);
+        // } else {
+
+        //     $queryStrings = array_filter(explode('/', $_GET['url']));
+        //     $nameClass = 'Controller';
+
+        //     foreach ($queryStrings as $key => $qs) {
+        //         unset($queryStrings[$key]);
+        //         $nameClass .= '\\' . ucfirst(Utils::hiphenToCamelCase($qs));
+        //         if (class_exists($nameClass)) {
+        //             break;
+        //         }
+        //     }
+
+        //     if (!class_exists($nameClass) || $nameClass == 'Controller') {
+        //         throw new EasyFastException("Class \"$nameClass\" not found.");
+        //     }
+
+        //     $class = new $nameClass;
+        //     $queryStrings = array_values($queryStrings);
+        //     if (count($queryStrings) > 0) {
+        //         $nameMethod = Utils::hiphenToCamelCase($queryStrings[0]);
+        //         if (method_exists($class, $nameMethod)) {
+        //             unset($queryStrings[0]);
+        //             call_user_func_array(array($class, $nameMethod), $queryStrings);
+        //         } else {
+        //             throw new EasyFastException("Method \"$nameMethod\" not found.");
+        //         }
+        //     } else {
+        //         if (method_exists($class, 'view')) {
+        //             $class->view();
+        //         } else {
+        //             throw new EasyFastException('Error generating display.');
+        //         }
+        //     }
+        // }
     }
 
     /**

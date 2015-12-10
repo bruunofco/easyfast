@@ -105,6 +105,7 @@ class Upload
      * Move o arquivo para o novo diretório e atribui um nome ao arquivo
      * @param string $dir
      * @param null|string $name
+     * @return string
      */
     public function save($dir, $name = null)
     {
