@@ -92,7 +92,6 @@ abstract class WebSocket
      * onClose
      * @param $client
      * @return mixed
-     * 
      */
     abstract public function onClose($client);
 
