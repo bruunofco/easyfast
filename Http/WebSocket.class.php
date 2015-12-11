@@ -5,7 +5,7 @@ namespace EasyFast\Http;
  * Class WebSocket
  *
  * @package EasyFast\Http
- * @author Bruno Oliveira <bruno.oliveira@riosoft.com.br>
+ * @author Bruno Oliveira <bruno@salluzweb.com.br>
  */
 abstract class WebSocket
 {
