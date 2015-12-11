@@ -128,6 +128,10 @@ abstract class WebSocket
                 } else {
                     while ($bytes >= 1) {
                         $receiveMessage = $this->unmask($buf);
+                        $dataMessage = json_decode($receiveMessage);
+                        if (json_last_error() == JSON_ERROR_NONE) {
+                            $receiveMessage = $dataMessage;
+                        }
                         // OnMessage
                         $this->onMessage($changedSocket, $receiveMessage);
                         break 2;
