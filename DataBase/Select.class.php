@@ -31,7 +31,6 @@ trait Select
     private $order;
     private $limit;
     private $join;
-    private $leftJoin;
     private $sth;
 
     /**
@@ -79,24 +78,8 @@ trait Select
      */
     public function leftJoin ($table, $column1, $operator, $column2)
     {
-        $this->leftJoin[] = "LEFT JOIN $table ON $column1 $operator $column2";
+        $this->join[] = "LEFT JOIN $table ON $column1 $operator $column2";
     }
-
-    /**
-     * Method getLeftJoin
-     * Get the created LEFT JOIN
-     * @author Bruno Oliveira <bruno@salluzweb.com.br>
-     * @access private
-     * @return string|null
-     */
-    private function getLeftJoin ()
-    {
-        if (isset($this->leftJoin)) {
-            return implode(' ', array_values($this->leftJoin)) . "\n";
-        }
-        return null;
-    }
-
 
     /**
      * Method limit
@@ -190,7 +173,6 @@ trait Select
             $this->setQuery("SELECT $cols FROM " .
                 $this->getTable() .
                 $this->getJoin() .
-                $this->getLeftJoin() .
                 $this->getWhere() .
                 $this->getOrderBy() .
                 $this->getLimit());
@@ -199,7 +181,6 @@ trait Select
             $this->sth = $this->prepare("SELECT $cols FROM " .
                 $this->getTable() .
                 $this->getJoin() .
-                $this->getLeftJoin() .
                 $this->getWhere() .
                 $this->getOrderBy() .
                 $this->getLimit());
