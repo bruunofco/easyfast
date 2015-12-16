@@ -27,8 +27,24 @@ use EasyFast\Exceptions\DBException;
  */
 trait Select
 {
+     /**
+     * Columns
+     * @var
+     */
     private $col;
-    private $order;
+
+    /**
+     * OrderBy
+     * @var array
+     */
+    private $order = array();
+
+    /**
+     * GroupBy
+     * @var array
+     */
+    private $group = array();
+
     private $limit;
     private $join;
     private $sth;
@@ -157,6 +173,40 @@ trait Select
 
         return substr($order, 0, strripos(trim($order), ',')) . "\n";
     }
+    
+    /**
+     * GroupBy
+     * Add a GROUP BY to the SQL script
+     * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     * @access public
+     * @param string $column Colunm name
+     * @return Connection
+     */
+    public function groupBy($column)
+    {
+        $this->group[] = $column;
+        return $this;
+    }
+
+    /**
+     * Get Group By
+     * Get the created GROUP BY
+     * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     * @access private
+     * @return string
+     */
+    private function getGroupBy()
+    {
+        $group = 'GROUP BY ';
+        if (isset($this->group)) {
+            foreach ($this->group as $value) {
+                $group .= $value . ', ';
+            }
+        }
+
+        return substr($group, 0, strripos(trim($group), ',')) . "\n";
+    }
+
 
     /**
      * Method select
