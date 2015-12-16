@@ -298,7 +298,7 @@ trait Utils
     /**
      * getGUID
      * Return GUID
-     * @author Bruno Oliveira <bruno.oliveira@riosoft.com.br>
+     * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @return string
      */
     public static function getGUID ()
