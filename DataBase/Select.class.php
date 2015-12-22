@@ -95,6 +95,7 @@ trait Select
     public function leftJoin ($table, $column1, $operator, $column2)
     {
         $this->join[] = "LEFT JOIN $table ON $column1 $operator $column2";
+        return $this;
     }
 
     /**
