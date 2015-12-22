@@ -80,6 +80,7 @@ trait Select
     public function leftJoin ($table, $column1, $operator, $column2)
     {
         $this->leftJoin[] = "LEFT JOIN $table ON $column1 $operator $column2";
+        return $this;
     }
 
     /**
@@ -129,15 +130,21 @@ trait Select
 
     /**
      * Method col
-     * Add a counm to the colunms for the SELECT
+     * Add a colunm to the colunms for the SELECT
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
      * @param string $col A colunm from the database
+     * @param string $as Alias column
      * @return Connection
      */
-    public function col ($col)
+    public function col($col, $as = null)
     {
-        $this->col[] = $col;
+        if (!is_null($as)) {
+            $this->col[] = $col . ' AS ' . $as;
+        } else {
+            $this->col[] = $col;
+        }
+
         return $this;
     }
 
