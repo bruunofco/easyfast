@@ -215,7 +215,7 @@ trait Utils
      */
     public static function decodeRequest ($getString = false)
     {
-        $contentType = explode(';', $_SERVER['CONTENT_TYPE']);
+        $contentType = explode(';', isset($_SERVER['CONTENT_TYPE']) ? $_SERVER['CONTENT_TYPE'] : null);
         if(in_array('multipart/form-data', $contentType)) {
             return (object) $_POST;
         }
