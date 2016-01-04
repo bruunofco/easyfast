@@ -235,21 +235,20 @@ trait Utils
 
     /**
      * Method callMethodArgsOrder
+     * 
      * Instancia método e associa os parametros
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @param string|object $class
      * @param string $method
      * @param array $args
+     * @param bool $websocket
      * @throws EasyFastException
+     * @return mixed
      */
-    public static function callMethodArgsOrder ($class, $method, $args)
+    public static function callMethodArgsOrder($class, $method, $args, $websocket = false)
     {
-        $arguments  = array();
-        $refle      = new ReflectionMethod($class, $method);
-
-        if (count($refle->getParameters()) && !count((array) $args)) {
-            throw new EasyFastException('It is mandatory to pass parameters.');
-        }
+        $arguments = array();
+        $refle = new ReflectionMethod($class, $method);
 
         foreach ($refle->getParameters() as $arg) {
             if (isset($args[$arg->name])) {
@@ -265,8 +264,11 @@ trait Utils
             $class = new $class;
         }
 
+        if ($websocket) {
+            return call_user_func_array(array($class, $method), $arguments);
+        }
         call_user_func_array(array($class, $method), $arguments);
-        die;
+        exit();
     }
 
     /**
