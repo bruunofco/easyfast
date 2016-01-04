@@ -129,21 +129,27 @@ class App
             $index = isset(self::$route['index']) ? self::$route['index'] : null;
             $this->routeLocation($index);
         } else {
-
             $queryStrings = array_filter(explode('/', $_GET['url']));
-            $nameClass = 'Controller\\' . ucfirst(Utils::hiphenToCamelCase($queryStrings[0]));
+            $nameClass = 'Controller';
 
-            if (!class_exists($nameClass)) {
+            foreach ($queryStrings as $key => $qs) {
+                unset($queryStrings[$key]);
+                $nameClass .= '\\' . ucfirst(Utils::hiphenToCamelCase($qs));
+                if (class_exists($nameClass)) {
+                    break;
+                }
+            }
+
+            if (!class_exists($nameClass) || $nameClass == 'Controller') {
                 throw new EasyFastException("Class \"$nameClass\" not found.");
             }
 
             $class = new $nameClass;
-
-            if (count($queryStrings) > 1) {
-                $nameMethod = Utils::hiphenToCamelCase($queryStrings[1]);
+            $queryStrings = array_values($queryStrings);
+            if (count($queryStrings) > 0) {
+                $nameMethod = Utils::hiphenToCamelCase($queryStrings[0]);
                 if (method_exists($class, $nameMethod)) {
                     unset($queryStrings[0]);
-                    unset($queryStrings[1]);
                     call_user_func_array(array($class, $nameMethod), $queryStrings);
                 } else {
                     throw new EasyFastException("Method \"$nameMethod\" not found.");
