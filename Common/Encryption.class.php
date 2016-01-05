@@ -68,9 +68,9 @@ class Encryption
      * @param string $val String a ser codificada
      * @return string
      */
-    public function generateHash ($val)
+    public static function generateHash ($val)
     {
-        return crypt($val, '$' . self::$saltPrefix .'$'. self::$defaultCost . '$' . $this->generateSalt() . '$');
+        return crypt($val, '$' . self::$saltPrefix .'$'. self::$defaultCost . '$' . self::generateSalt() . '$');
     }
 
     /**
@@ -82,7 +82,7 @@ class Encryption
      * @return boolean
      * @throws EasyFastException
      */
-    public function check ($string, $hash)
+    public static function check ($string, $hash)
     {
         if (crypt($string, $hash) === $hash) {
             return true;
