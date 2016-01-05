@@ -186,7 +186,7 @@ class Connection
     {
         try {
             $this->conn->commit();
-            $this->clearQuery();
+            $this->cleanQuery();
         } catch (PDOException $e) {
             throw new DBException($e->getMessage(), $e->getCode());
         }
@@ -203,7 +203,7 @@ class Connection
     {
         try {
             $this->conn->rollback();
-            $this->clearQuery();
+            $this->cleanQuery();
         } catch (PDOException $e) {
             throw new DBException($e->getMessage(), $e->getCode());
         }
