@@ -114,7 +114,7 @@ class Upload
         }
 
         if (!is_dir($dir)) {
-            mkdir($dir, 0755);
+            mkdir($dir, 0755, true);
         }
 
         move_uploaded_file($this->file['tmp_name'], $dir . $this->fileName);
