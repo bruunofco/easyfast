@@ -318,4 +318,31 @@ trait Utils
                    .substr($charid,20,12);
         }
     }
+    
+    /**
+     * Set Global variable
+     *
+     * @param $var
+     * @param $value
+     * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     */
+    public static function setGlobalVar($var, $value)
+    {
+        $GLOBALS[$var] = $value;
+    }
+
+    /**
+     * Get Global variable
+     *
+     * @param $var
+     * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     * @return mixed
+     */
+    public static function getGlobalVar($var)
+    {
+        if (isset($GLOBALS[$var])) {
+            return $GLOBALS[$var];
+        }
+        return null;
+    }
 }
