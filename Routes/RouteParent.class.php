@@ -3,6 +3,7 @@ namespace EasyFast\Routes;
 
 use EasyFast\Config\Config;
 use EasyFast\Exceptions\EasyFastException;
+use EasyFast\Exceptions\RouteException;
 
 /**
  * Class RouteParent
@@ -20,6 +21,13 @@ abstract class RouteParent
     protected static $routes;
 
     /**
+     * Contains the route list
+     *
+     * @var array
+     */
+    protected static $routeList;
+
+    /**
      * Get Routes
      *
      * @return object
@@ -30,49 +38,64 @@ abstract class RouteParent
     }
 
     /**
+     * @param $routes
+     */
+    public static function setRoutes($routes)
+    {
+        self::$routes = $routes;
+    }
+
+    /**
      * Directs the application to the URL specified
      *
      * @param $url
      * @param bool|false $extern
-     * @throws EasyFastException
+     * @throws RouteException
      */
     public static function location($url, $extern = false)
     {
         if ($extern) {
             header("Location: {$url}");
         } else {
-            if (empty(Config::getConfig()->App->WebHost)) {
-                throw new EasyFastException('Web Host not set in your settings file');
+            try {
+                header('Location: ' . Config::getWebHost() . $url);
+            } catch (EasyFastException $e) {
+                throw new RouteException('Web Host not set in your settings file.');
             }
-            header('Location: ' . Config::getWebHost() . $url);
         }
     }
 
     /**
+     * Get Route
+     *
      * @param $controller
      * @param null $name
-     * @return \stdClass
-     * @throws EasyFastException
+     * @return RouteController
+     * @throws RouteException
      */
     public static function getRoute($controller, $name = null)
     {
         if (empty(self::getRoutes()->{$controller})) {
-            throw new EasyFastException("No existing route {$controller}");
+            throw new RouteException("No existing route {$controller}");
         }
 
         if (is_null($name)) {
             $controllerRoute = new RouteController();
-            $controllerRoute->route = self::getRoutes()->{$controller};
+            $controllerRoute->routeConfig = self::getRoutes()->{$controller};
             return $controllerRoute;
         }
 
         foreach (self::getRoutes()->{$controller} as $key => $ctrl) {
             if (isset($ctrl['name']) && $ctrl['name'] == $name) {
-                return self::getRoutes()->{$controller}[$key];
+                $controllerRoute = new RouteController();
+                $controllerRoute->routeConfig = self::getRoutes()->{$controller}[$key];
+                return $controllerRoute;
             } elseif (isset($ctrl['url']) && $ctrl['url'] == $name) {
-                return self::getRoutes()->{$controller}[$key];
+                $controllerRoute = new RouteController();
+                $controllerRoute->routeConfig = self::getRoutes()->{$controller}[$key];
+                return $controllerRoute;
             }
         }
-        throw new EasyFastException("No existing route {$controller}.{$name}");
+        throw new RouteException("No existing route {$controller}.{$name}");
     }
 }

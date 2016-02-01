@@ -42,20 +42,21 @@ trait Utils
      * @example jsonEncode('My value') = Transforma string em array e converte em json, identificador é 0;
      * @return string
      */
-    public static function jsonEncode ($val, $key = null) {
+    public static function jsonEncode($val, $key = null)
+    {
         //TODO: Repensar lógica deste método
         if (is_array($val)) {
-            
+
             if (isset($val[0]) && is_object($val[0])) {
                 $arr = array();
-                foreach ((array) $val as $k => $v) {
-                    $arr[] = (array) $v;
+                foreach ((array)$val as $k => $v) {
+                    $arr[] = (array)$v;
                 }
                 return json_encode($arr);
             } else {
                 return json_encode($val);
             }
-            
+
         } elseif (is_array($val) && is_array($key)) {
             $string = null;
             foreach ($val as $ide => $value) {
@@ -79,7 +80,7 @@ trait Utils
 //                            $array[trim($k)] = trim($v);
 //                        }
 //                    } else {
-                        $array[trim($value[0])] = trim($value[1]);
+                    $array[trim($value[0])] = trim($value[1]);
 //                    }
 
                 } else {
@@ -98,10 +99,10 @@ trait Utils
      * @param string $string
      * @return string
      */
-    public static function hiphenToCamelCase ($string)
+    public static function hiphenToCamelCase($string)
     {
-        $str1 = array('-a','-b','-c','-d','-e','-f','-g','-h','-i','-j','-k','-l','-m','-n','-o','-p','-q','-r','-s','-t','-u','-v','-w','-x','-y','-z');
-        $str2 = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+        $str1 = array('-a', '-b', '-c', '-d', '-e', '-f', '-g', '-h', '-i', '-j', '-k', '-l', '-m', '-n', '-o', '-p', '-q', '-r', '-s', '-t', '-u', '-v', '-w', '-x', '-y', '-z');
+        $str2 = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
         return str_replace($str1, $str2, $string);
     }
 
@@ -112,10 +113,10 @@ trait Utils
      * @param string $string
      * @return string
      */
-    public static function snakeToCamelCase ($string)
+    public static function snakeToCamelCase($string)
     {
-        $str1 = array('_a','_b','_c','_d','_e','_f','_g','_h','_i','_j','_k','_l','_m','_n','_o','_p','_q','_r','_s','_t','_u','_v','_w','_x','_y','_z');
-        $str2 = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
+        $str1 = array('_a', '_b', '_c', '_d', '_e', '_f', '_g', '_h', '_i', '_j', '_k', '_l', '_m', '_n', '_o', '_p', '_q', '_r', '_s', '_t', '_u', '_v', '_w', '_x', '_y', '_z');
+        $str2 = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
         return ucfirst(str_replace($str1, $str2, $string));
     }
 
@@ -126,10 +127,10 @@ trait Utils
      * @param string $string
      * @return string
      */
-    public static function camelToSnakeCase ($string)
+    public static function camelToSnakeCase($string)
     {
-        $str1 = array('A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');
-        $str2 = array('_a','_b','_c','_d','_e','_f','_g','_h','_i','_j','_k','_l','_m','_n','_o','_p','_q','_r','_s','_t','_u','_v','_w','_x','_y','_z');
+        $str1 = array('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z');
+        $str2 = array('_a', '_b', '_c', '_d', '_e', '_f', '_g', '_h', '_i', '_j', '_k', '_l', '_m', '_n', '_o', '_p', '_q', '_r', '_s', '_t', '_u', '_v', '_w', '_x', '_y', '_z');
         $string = substr(str_replace($str1, $str2, $string), 0, 1) == '_' ? substr(str_replace($str1, $str2, $string),
             1) : str_replace($str1, $str2, $string);
         return $string;
@@ -145,9 +146,9 @@ trait Utils
      * @access public
      * @return void
      */
-    public static function requireParam ($data, $param)
+    public static function requireParam($data, $param)
     {
-        if (is_object($data)){
+        if (is_object($data)) {
             if (is_array($param)) {
                 foreach ($param as $p) {
                     if (!property_exists($data, $p)) {
@@ -177,7 +178,7 @@ trait Utils
      * @throws EasyFastException
      * @return mixed
      */
-    public static function arrayExistsKeys ($array, $key)
+    public static function arrayExistsKeys($array, $key)
     {
         $array = new ArrayObject($array);
 
@@ -213,13 +214,15 @@ trait Utils
      * @access public
      * @return mixed
      */
-    public static function decodeRequest ($getString = false)
+    public static function decodeRequest($getString = false)
     {
-        $contentType = explode(';', isset($_SERVER['CONTENT_TYPE']) ? $_SERVER['CONTENT_TYPE'] : null);
-        if(in_array('multipart/form-data', $contentType)) {
-            return (object) $_POST;
+        if (isset($_SERVER['CONTENT_TYPE'])) {
+            $contentType = explode(';', isset($_SERVER['CONTENT_TYPE']));
+            if (in_array('multipart/form-data', $contentType)) {
+                return (object)$_POST;
+            }
         }
-        
+
         if ($getString) {
             return file_get_contents("php://input");
         }
@@ -229,23 +232,21 @@ trait Utils
             return $data;
         } else {
             parse_str(file_get_contents("php://input"), $result);
-            return (object) $result;
+            return (object)$result;
         }
     }
 
     /**
      * Method callMethodArgsOrder
-     * 
      * Instancia método e associa os parametros
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @param string|object $class
      * @param string $method
      * @param array $args
-     * @param bool $websocket
      * @throws EasyFastException
      * @return mixed
      */
-    public static function callMethodArgsOrder($class, $method, $args, $websocket = false)
+    public static function callMethodArgsOrder($class, $method, $args = array())
     {
         $arguments = array();
         $refle = new ReflectionMethod($class, $method);
@@ -264,11 +265,7 @@ trait Utils
             $class = new $class;
         }
 
-        if ($websocket) {
-            return call_user_func_array(array($class, $method), $arguments);
-        }
-        call_user_func_array(array($class, $method), $arguments);
-        exit();
+        return call_user_func_array(array($class, $method), $arguments);
     }
 
     /**
@@ -278,11 +275,11 @@ trait Utils
      * @param $mask
      * @return string
      */
-    public static function mask ($val, $mask)
+    public static function mask($val, $mask)
     {
         $maskared = '';
         $k = 0;
-        for ($i = 0; $i <= strlen($mask)-1; $i++) {
+        for ($i = 0; $i <= strlen($mask) - 1; $i++) {
             if ($mask[$i] == '#') {
                 if (isset($val[$k])) {
                     $maskared .= $val[$k++];
@@ -303,31 +300,30 @@ trait Utils
      * @author Bruno Oliveira <bruno.oliveira@riosoft.com.br>
      * @return string
      */
-    public static function getGUID ()
+    public static function getGUID()
     {
         if (function_exists('com_create_guid')) {
             return com_create_guid();
         } else {
-            mt_srand((double) microtime() * 10000);
+            mt_srand((double)microtime() * 10000);
             $charid = strtoupper(md5(uniqid(rand(), true)));
             $hyphen = '-';
-            return substr($charid, 0, 8).$hyphen
-                   .substr($charid, 8, 4).$hyphen
-                   .substr($charid,12, 4).$hyphen
-                   .substr($charid,16, 4).$hyphen
-                   .substr($charid,20,12);
+            return substr($charid, 0, 8) . $hyphen
+            . substr($charid, 8, 4) . $hyphen
+            . substr($charid, 12, 4) . $hyphen
+            . substr($charid, 16, 4) . $hyphen
+            . substr($charid, 20, 12);
         }
     }
 
     /**
      * arrayToObject
      * @param $array
-     * @param $object
      * @return \stdClass
      */
-    public static function arrayToObject($array, $object = '\stdClass')
+    public static function arrayToObject($array)
     {
-        $obj = new $object;
+        $obj = (object)array();
         foreach ($array as $k => $v) {
             if (strlen($k)) {
                 if (is_array($v)) {

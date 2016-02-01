@@ -17,9 +17,10 @@
 
 namespace EasyFast\Http;
 
-use EasyFast\Exceptions\EasyFastException;
-use EasyFast\Common\Utils;
 use StdClass;
+use EasyFast\App;
+use EasyFast\Common\Utils;
+use EasyFast\Exceptions\EasyFastException;
 
 /**
  * Class Restful
@@ -53,37 +54,44 @@ class Restful
      * @param string $url
      * @param callback|array $callback
      * @param bool $argsAssoc Informa se os argumentos são associativos
+     * @param bool $returnJson Transforma o retorno ou echo em json
      * @return bool|callback
      */
-    public function server($method, $url, $callback, $argsAssoc = true)
+    public function server($method, $url, $callback, $argsAssoc = true, $returnJson = true)
     {
         $method = strtoupper($method);
         try {
             if ($this->checkUrl($url) && ($_SERVER['REQUEST_METHOD'] == $method && is_callable($callback))) {
-
+                ob_clean();
+                $return = null;
                 if (is_array($callback) && $argsAssoc) {
                     $data = Utils::decodeRequest();
-
                     if (empty($data)) {
                         $data = new StdClass();
                     }
-                    
                     foreach ($this->queryString as $key => $val) {
                         $data->$key = $val;
                     }
-
-                    Utils::callMethodArgsOrder($callback[0], $callback[1], (array)$data);
+                    $return = Utils::callMethodArgsOrder($callback[0], $callback[1], (array)$data);
                 } elseif (is_array($callback)) {
-                    call_user_func_array(array(new $callback[0], $callback[1]), $this->queryString);
+                    $return = call_user_func_array(array(new $callback[0], $callback[1]), $this->queryString);
                 } else {
-                    call_user_func_array($callback, $this->queryString);
+                    $return = call_user_func_array($callback, $this->queryString);
                 }
 
+                $content = ob_get_contents();
+                ob_clean();
+
+                if ((is_string($return) || is_null($return)))  {
+                    $this->response(array('message' => (trim($content . ' '. $return))));
+                } elseif (is_array($return) || is_object($return)) {
+                    $this->response($return);
+                }
                 exit();
             }
-
         } catch (EasyFastException $e) {
-            $this->response('status => error | message => ' . $e->getMessage(), 412);
+            $code = is_null($e->getCode()) ? 412 : $e->getCode();
+            $this->response('status => error | message => ' . $e->getMessage(), $code);
         }
 
         return false;
@@ -130,7 +138,7 @@ class Restful
      * @throws EasyFastException
      * @return array
      */
-    private function checkUrl($url)
+    public function checkUrl($url)
     {
         $url = array_filter(explode('/', $url));
         $queryString = array_filter(explode('/', isset($_GET['url']) ? $_GET['url'] : null));
@@ -153,6 +161,16 @@ class Restful
     }
 
     /**
+     * Get QueryString format
+     *
+     * @return array
+     */
+    public function getQueryString()
+    {
+        return $this->queryString;
+    }
+
+    /**
      * Method response
      * Return response in json, HTTP Status and exit system
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
@@ -162,12 +180,10 @@ class Restful
      * @access public
      * @return string
      */
-    public static function response($response, $httpStatus = null, $break = true)
+    public static function response($response, $httpStatus = 200, $break = true)
     {
-        if (!empty($httpStatus)) {
-            header("HTTP/1.1 {$httpStatus}");
-        }
-
+        header("HTTP/1.1 {$httpStatus}");
+        header('Content-Type: application/json');
         echo Utils::jsonEncode($response);
         if ($break) {
             exit();

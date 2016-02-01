@@ -31,6 +31,7 @@ class Init
         $this->checkArgs($argv);
         if ($argv[1] != 'create') {
             echo "Error method {$argv[1]} does not exist" . PHP_EOL;
+            exit();
         }
 
         if (array_key_exists($argv[2], $this->argsAction)) {

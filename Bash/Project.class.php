@@ -53,6 +53,12 @@ class Project extends ParentBash
         $htaccess->dir = $this->directory;
         $htaccess->createHtaccess();
 
+        $config = $this->readStdin('Create config file (yes, no): ', array('yes', 'y', 'no', 'n'));
+
+        if ($config == 'yes' OR $config == 'y') {
+            
+        }
+
     }
 
     /**

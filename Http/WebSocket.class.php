@@ -228,6 +228,10 @@ abstract class WebSocket
     public function sendMessage($message, $client = null, $mask = true)
     {
         if ($mask) {
+            $dataMessage = json_encode($message);
+            if (json_last_error() == JSON_ERROR_NONE) {
+                $message = $dataMessage;
+            }
             $message = $this->mask($message);
         }
         if (is_null($client)) {

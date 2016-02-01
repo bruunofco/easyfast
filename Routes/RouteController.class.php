@@ -14,7 +14,7 @@ class RouteController extends RouteParent
      *
      * @var array
      */
-    public $route;
+    public $routeConfig;
 
     /**
      * Go Route
@@ -24,8 +24,8 @@ class RouteController extends RouteParent
      */
     public function go($name)
     {
-        foreach ($this->route as $key => $action) {
-            if (isset($ctrl['name']) && $ctrl['name'] == $name) {
+        foreach ($this->routeConfig as $key => $action) {
+            if (isset($action['name']) && $action['name'] == $name) {
                 $this->location($action['url']);
             } elseif (isset($ctrl['url']) && $ctrl['url'] == $name) {
                 $this->location($action['url']);

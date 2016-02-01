@@ -37,17 +37,18 @@ class App extends Config
     /**
      * Constantes do framework
      */
-    CONST VERSION    = '1.0';
+    CONST VERSION    = '1.2';
     CONST NAME_FW    = 'EasyFast';
     CONST NAME_SPACE = 'EasyFast';
     CONST SITE       = 'https://github.com/bruunofco/easyfast/';
     CONST AUTHOR     = 'Bruno Oliveira';
 
-    /**
-     * Armazena objeto Registry
-     * @var object $registry
-     */
-    public static $registry;
+    public function __construct()
+    {
+        header('Developed-With: ' . App::NAME_FW . ' | ' . App::SITE);
+        $this->setDir(getcwd());
+        spl_autoload_register(array($this, 'loader'));
+    }
 
     /**
      * Method run
@@ -57,12 +58,11 @@ class App extends Config
      */
     public function run()
     {
-        spl_autoload_register(array($this, 'loader'));
-        if ($this->sessionAutoStart) {
+        if ($this->getAppConfig('sessionAutoStart')) {
             new Session();
         }
-        $route = new Route();
-        $route->intercepRequests();
+
+        Route::interceptRequests();
     }
 
     /**
@@ -75,20 +75,17 @@ class App extends Config
      */
     private function loader($fileName)
     {
-        $fileCheck = explode('\\', $fileName);
-
+        $fileName = preg_filter("/\\\/", '/', $fileName);
+        $fileCheck = explode(DIRECTORY_SEPARATOR, $fileName);
         if ($fileCheck[0] == self::NAME_SPACE) {
             unset($fileCheck[0]);
             $fileName = implode(DIRECTORY_SEPARATOR, $fileCheck);
             require_once __DIR__ . DIRECTORY_SEPARATOR . "{$fileName}.class.php";
         } else {
-            if (!isset(Config::getConfig()->App->Dir)) {
-                throw new EasyFastException('Directory not defined');
-            }
-            if (file_exists(Config::getConfig()->App->Dir . "{$fileName}.class.php")) {
-                require_once Config::getConfig()->App->Dir . "{$fileName}.class.php";
-            } elseif (file_exists(strtolower(Config::getConfig()->App->Dir . "{$fileName}.class.php"))) {
-                require_once strtolower(Config::getConfig()->App->Dir . "{$fileName}.class.php");
+            if (file_exists(Config::getAppConfig('dir') . "{$fileName}.class.php")) {
+                require_once Config::getAppConfig('dir') . "{$fileName}.class.php";
+            } elseif (file_exists(strtolower(Config::getAppConfig('dir') . "{$fileName}.class.php"))) {
+                require_once strtolower(Config::getAppConfig('dir') . "{$fileName}.class.php");
             }
         }
     }
@@ -112,5 +109,4 @@ class App extends Config
 
         call_user_func_array(array($class, $method), $params);
     }
-
 }

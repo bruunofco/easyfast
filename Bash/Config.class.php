@@ -13,6 +13,8 @@ class Config extends ParentBash
 
     protected $database = array();
 
+    protected $view = array();
+
     protected $fileName = 'easyfast_conf.ini';
 
     /**
@@ -36,6 +38,14 @@ class Config extends ParentBash
             $this->database['password'] = $this->readStdin('Password: ', null);
             $this->database['drive'] = $this->readStdin('Drive (mysql): ', null, 'mysql');
             $this->database['port'] = $this->readStdin('Port (3306): ', null, '3306');
+        }
+
+        $configView = $this->readStdin('Config view? (yes or no): ', array('yes', 'no', 'y', 'n'));
+
+        if ($configView == 'yes' OR $configView == 'y') {
+            echo "Insert config view \n";
+            $this->view['title'] = $this->readStdin('Title (My Site): ', null);
+            $this->view['dirTpl'] = $this->readStdin('Directory TPL: ', null);
         }
 
         $this->createFile();
@@ -72,18 +82,26 @@ class Config extends ParentBash
 
 ; Application initial config
 [App]
-name                            = {$this->app['name']}
-webhost                         = {$this->app['webhost']}
-defaultController               = {$this->app['defaultController']}
+Name                            = {$this->app['name']}
+WebHost                         = {$this->app['webhost']}
+DefaultController               = {$this->app['defaultController']}
+RouteAutomatic                  = true
+ControllerDirectory             = Controller
 
 ; Data Base config
 [DataBase]
-Main.HostName                   = {$this->database['hostname']}
-Main.DBName                     = {$this->database['dbname']}
-Main.UserName                   = {$this->database['username']}
-Main.Password                   = {$this->database['password']}
-Main.Drive                      = {$this->database['drive']}
-Main.Port                       = {$this->database['port']}
+Main[HostName]                  = {$this->database['hostname']}
+Main[DBName]                    = {$this->database['dbname']}
+Main[UserName]                  = {$this->database['username']}
+Main[Password]                  = {$this->database['password']}
+Main[Drive]                     = {$this->database['drive']}
+Main[Port]                      = {$this->database['port']}
+
+; Variables available in the View
+[View]
+Title                           = {$this->view['title']}
+DirTpl                          = {$this->view['dirTpl']}
+
 file;
     }
 }

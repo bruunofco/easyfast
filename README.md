@@ -1,4 +1,4 @@
-# EasyFast PHP Framework
+# EasyFast PHP Framework v1.2
 
 EasyFast PHP is a framework that makes PHP programming fast and easy, using a simple and elegant syntax.
 
