@@ -1,13 +1,11 @@
 <?php
 include '../App.class.php';
-include '../Route.class.php';
 
-echo 'Ok'; die;
-
-$app = new EasyFast\App;
-$app->setConfigFile('config.ini');
-$app->setConfigFileRoute('routes.ef');
-$app->setDir(__DIR__);
-$app->run();
-
-
+try {
+    $app = new EasyFast\App();
+    $app->setConfigFile('config.ini');
+    $app->setConfigFileRoute('routes.ef');
+    $app->run();
+} catch (\EasyFast\Exceptions\EasyFastException $e) {
+    echo 'Ocorreu um erro: ' . $e->getMessage();
+}
