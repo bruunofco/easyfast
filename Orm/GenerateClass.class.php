@@ -27,67 +27,67 @@ use EasyFast\Exceptions\EasyFastException;
 
 /**
  * Class GenerateClass
- * Faz a leitura do Schema XML e cria as classes e traits
+ * Reads the XML Schema and create classes and traits
  * @package EasyFast\ORM
  * @author Bruno Oliveira <bruno@salluzweb.com.br>
  */
 trait GenerateClass
 {
     /**
-     * @var MXML Armagena o schema do banco de dados
+     * @var MXML Stores the database schema
      */
     private $schema;
 
     /**
-     * @var array Armagena as tabelas estrangeira
+     * @var array Stores the foreign tables
      */
     private $foreignTable;
 
     /**
-     * @var string Armagena o nome da classe
+     * @var string Stores the class name
      */
     private $nameClass;
 
     /**
-     * @var Armagena o namespace
+     * @var Stores the namespace
      */
     private $namespace;
 
     /**
-     * @var Armagena os metódos seters da classe atual
+     * @var Stores setters methods of the current class
      */
     private $methodsSeters;
 
     /**
-     * @var Armagena os metódos geters da classe atual
+     * @var Stores getters methods of the current class
      */
     private $methodsGeters;
 
     /**
-     * @var Armagena as propriedades da classe atual
+     * @var Stores the properties of the current class
      */
     private $propertys;
 
     /**
-     * @var Armagena a estrutura da classe atual
+     * @var Stores the structure of the current class
      */
     private $structureClass;
 
     /**
-     * @var string Armagena o diretorio principal onde serão gravada as classes
+     * @var string Stores the main directory where the classes will be recorded
      */
     private $dir = 'Model';
 
     /**
-     * @var bool Informa se o campo de chave estrangeira é lazyLoad ou não
+     * @var bool Tells whether the foreign key field is LazyLoad or not
      */
     private $lazyLoad;
 
     /**
      * Method setDir
-     * Seta diretorio onde serão armagernado as classes
+     * Arrow directory where they are stored classes
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
-     * @param string $dir Diretorio onde serão armazenada as classes
+     * @param string $dir Directory where they are stored classes
      * @access public
      * @throws EasyFastException
      */
@@ -95,7 +95,7 @@ trait GenerateClass
     {
         if (!file_exists($dir)) {
             if (!mkdir($dir, 0775, true)) {
-                throw new EasyFastException('Não foi possível criar o diretório: "' . $dir . '"');
+                throw new EasyFastException('Could not create the directory: "' . $dir . '"');
             }
         }
         $this->dir = $dir;
@@ -103,7 +103,7 @@ trait GenerateClass
 
     /**
      * Method setXmlFile
-     * Seta o arquivo XML fisico contendo o schema
+     * Sets the physical XML file containing the schema
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @param string $xml
      */
@@ -115,7 +115,7 @@ trait GenerateClass
 
     /**
      * Method setSchema
-     * Seta XML contendo o schema do banco de dados
+     * Arrow containing the XML database schema
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @param string $xml
      */
@@ -127,7 +127,7 @@ trait GenerateClass
 
     /**
      * Method createTraits
-     * Cria estrutura das traits conforme arquivo Schema XML e armazena fisicamente
+     * Create traits of structure as XML Schema file and physically store
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      */
     public function createTraits ()
@@ -135,7 +135,7 @@ trait GenerateClass
         $dir = $this->dir.'/Traits';
         if (!file_exists($dir)) {
             if (!mkdir($dir, 0775, true)) {
-                throw new EasyFastException('Não foi possível criar o diretório: "' . $dir . '"');
+                throw new EasyFastException('Could not create the directory: "' . $dir . '"');
             }
         }
 
@@ -172,7 +172,7 @@ trait GenerateClass
                     } elseif ($columns->tagName == 'foreign-key') {
                         foreach ($columns->childNodes as $fk) {
 
-                            // Checa se existe mais de uma chave estrangeira para uma mesma tabela, caso exista concatena com o nome do campo
+                            // Check if there is more than one foreign key to the same table, if any concatenate with the field name
                             $countOccurrence = $this->schema->query('foreign-key[foreignTable="' . $columns->getAttribute('foreignTable') . '"]', $columns)->length;
 
                             $class = Utils::snakeToCamelCase($columns->getAttribute('foreignTable'));
@@ -208,7 +208,7 @@ trait GenerateClass
 
     /**
      * Method createClass
-     * Cria estrutura das classes conforme arquivo Schema XML e armazena fisicamente
+     * Create the class structure as XML Schema file and physically store
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
      */
@@ -217,7 +217,7 @@ trait GenerateClass
         $dir = $this->dir;
         if (!file_exists($dir)) {
             if (!mkdir($dir, 0775, true)) {
-                throw new EasyFastException('Não foi possível criar o diretório: "' . $dir . '"');
+                throw new EasyFastException('Could not create the directory: "' . $dir . '"');
             }
         }
 
@@ -247,7 +247,7 @@ trait GenerateClass
 
         $v  = "\t/**";
         $v .= "\n\t * Method set{$name}";
-        $v .= "\n\t * Atribui valor para propriedade " . lcfirst($name);
+        $v .= "\n\t * Assign value to property " . lcfirst($name);
         $v .= "\n\t */";
         $v .= "\n\tpublic function set{$name} (\$val)";
         $v .= "\n\t{";
@@ -260,9 +260,9 @@ trait GenerateClass
 
     /**
      * Method methodSetFt
-     * Gera método seter para foreign table
-     * @param string $ft Nome da tabela estrangeira
-     * @param string $ftPhpName Apelido para o método
+     * Generates setter method for foreign table
+     * @param string $ft Name of the foreign table
+     * @param string $ftPhpName Nickname for the method
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      */
     private function methodSetFt ($property, $propLocal, $ft, $ftPhpName = null, $table)
@@ -275,10 +275,11 @@ trait GenerateClass
 
         $v  = "\t/**";
         $v .= "\n\t * Method set$ftName";
-        $v .= "\n\t * Atribui valor para a propriedade " . lcfirst($property);
+        $v .= "\n\t * Assign value to the property " . lcfirst($property);
         $v .= "\n\t */";
         $v .= "\n\tpublic function set$ftName ($table \$val)";
         $v .= "\n\t{";
+        $v .= "\n\t\t\$this->tmpObject{$ftName} = null;";
         $v .= "\n\t\tif (\$val->get$property() == null) " . '{';
         $v .= "\n\t\t\t\$val->save();";
         $v .= "\n\t\t}";
@@ -291,7 +292,7 @@ trait GenerateClass
 
     /**
      * Method methodGet
-     * Gera método geters
+     * Generate getters methods
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @param string $columnName;
      */
@@ -314,7 +315,7 @@ trait GenerateClass
 
     /**
      * Method methodGetFt
-     * Gera método geters para foreign table
+     * Generate Getters methods to foreign table
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      */
     private function methodGetFt ($property, $ft, $ftPhpName = null, $class)
@@ -328,9 +329,13 @@ trait GenerateClass
         $v .= "\n\t * Method get{$ftName}";
         $v .= "\n\t * Obtêm o objeto " . lcfirst($ft);
         $v .= "\n\t */";
+        $v .= "\n\tprivate \$tmpObject{$ftName} = null;";
         $v .= "\n\tpublic function get{$ftName} ()";
         $v .= "\n\t{";
-        $v .= "\n\t\treturn new {$class}(\$this->$property);";
+        $v .= "\n\t\tif(is_null(\$this->tmpObject{$ftName})) {";
+        $v .= "\n\t\t\t\$this->tmpObject{$ftName} = new {$class}(\$this->$property);";
+        $v .= "\n\t\t}";
+        $v .= "\n\t\treturn \$this->tmpObject{$ftName};";
         $v .= "\n\t}";
         $v .= "\n\n";
 
@@ -339,10 +344,10 @@ trait GenerateClass
 
     /**
      * Method structureTrait
-     * Gera a estrutura das traits
+     * Generates the structure of traits
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @return string
-     * @param string $use declara uso de classes no contexto da trait
+     * @param string $use declare the use of classes in the context of trait
      */
     private function structureTrait ($use = null)
     {
@@ -354,7 +359,7 @@ trait GenerateClass
 
         $v .= "\n\n/**";
         $v .= "\n * Trait {$this->nameClass}";
-        $v .= "\n * Contêm métodos geters seters";
+        $v .= "\n * They contain methods getters setters";
         $v .= "\n */";
         $v .= "\ntrait Trait{$this->nameClass}";
         $v .= "\n{";
@@ -369,7 +374,7 @@ trait GenerateClass
 
     /**
      * Method generateStructureClass
-     * Responsável em criar a estrutura da classe
+     * Responsible for creating the structure of the class
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @return string
      */
@@ -381,7 +386,7 @@ trait GenerateClass
         $v .= "\n\nuse EasyFast\\Mvc\\Model;";
         $v .= "\n\n/**";
         $v .= "\n * Class {$this->nameClass}";
-        $v .= "\n * Contêm regras de négocio relacionado a este objeto";
+        $v .= "\n * They contain business rules related to this object";
         $v .= "\n */";
         $v .= "\nclass {$this->nameClass} extends Model";
         $v .= "\n{";
