@@ -217,7 +217,7 @@ trait Utils
     {
         $contentType = explode(';', isset($_SERVER['CONTENT_TYPE']) ? $_SERVER['CONTENT_TYPE'] : null);
         if(in_array('multipart/form-data', $contentType)) {
-            return (object) $_POST;
+            return (object) array_merge($_REQUEST, $_FILES);
         }
         
         if ($getString) {
