@@ -27,6 +27,7 @@ class Upload
     private $file;
     private $extension;
     private $fileName;
+    private $mimeType;
 
     /**
      * Method __construct
@@ -60,23 +61,23 @@ class Upload
 
         $newImage = imagecreatetruecolor($width, $height);
 
-        switch ($this->extension) {
-            case 'png':
+        switch ($this->mimeType) {
+            case 'image/png':
                 $image = imagecreatefrompng($this->file['tmp_name']);
                 imagecopyresampled($newImage, $image, 0, 0, 0, 0, $width, $height, $sizeImg[0], $sizeImg[1]);
                 imagepng($newImage, $this->file['tmp_name']);
                 break;
-            case 'gif':
+            case 'image/gif':
                 $image = imagecreatefromgif($this->file['tmp_name']);
                 imagecopyresampled($newImage, $image, 0, 0, 0, 0, $width, $height, $sizeImg[0], $sizeImg[1]);
                 imagegif($newImage, $this->file['tmp_name']);
                 break;
-            case 'jpg':
+            case 'image/jpeg':
                 $image = imagecreatefromjpeg($this->file['tmp_name']);
                 imagecopyresampled($newImage, $image, 0, 0, 0, 0, $width, $height, $sizeImg[0], $sizeImg[1]);
                 imagejpeg($newImage, $this->file['tmp_name']);
                 break;
-            case 'jpeg':
+            case 'image/pjpeg':
                 $image = imagecreatefromjpeg($this->file['tmp_name']);
                 imagecopyresampled($newImage, $image, 0, 0, 0, 0, $width, $height, $sizeImg[0], $sizeImg[1]);
                 imagejpeg($newImage, $this->file['tmp_name']);
@@ -93,6 +94,7 @@ class Upload
     private function extension ()
     {
         $this->extension = strtolower(end(explode('.', $this->file['name'])));
+        $this->mimeType = image_type_to_mime_type(exif_imagetype($this->file['tmp_name']));
     }
 
     /**
