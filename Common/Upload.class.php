@@ -120,5 +120,6 @@ class Upload
         }
 
         move_uploaded_file($this->file['tmp_name'], $dir . $this->fileName);
+        return $this->fileName;
     }
 }
