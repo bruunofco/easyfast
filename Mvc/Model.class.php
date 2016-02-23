@@ -34,24 +34,25 @@ use EasyFast\Exceptions\EasyFastException;
 abstract class Model
 {
     /**
-     * @var $conn Armagena a instancia de conexão com o banco de dados
+     * @var $conn object a instancia de conexão com o banco de dados
      */
     private static $conn;
 
     /**
-     * @var $result Armagena o resultado do método executado
+     * @var $result object o resultado do método executado
      */
     private static $result;
 
     /**
      * Method construct()
      * Passando o parametro $id executa o método $this->fetch()
-     * @param int|null $pk Primary Key do registro na tabela
+     * @param int|null $param1
+     * @param int|null $param2
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
      * @throws EasyFastException
      */
-    public function __construct ($param1 = null, $param2 = null)
+    public function __construct($param1 = null, $param2 = null)
     {
         $conn = self::conn();
         $conn->cleanQuery();
@@ -73,18 +74,18 @@ abstract class Model
                     $this->$methodProp($val);
                 }
             } else {
-                throw new EasyFastException('Não existe nenhum registro em \'' . self::getTable() . '\' com \'' . self::getPrimaryKey($conn)  . '\' = \'' . $param1 . '\'');
+                throw new EasyFastException('Não existe nenhum registro em \'' . self::getTable() . '\' com \'' . self::getPrimaryKey($conn) . '\' = \'' . $param1 . '\'');
             }
 
             self::$result = $this;
         }
     }
-    
-    public function __destruct ()
+
+    public function __destruct()
     {
-    	if(!is_null(self::$conn) && !self::$conn->inTransaction()) {
-        	self::$conn = null;
-    	}
+        if (!is_null(self::$conn) && !self::$conn->inTransaction()) {
+            self::$conn = null;
+        }
     }
 
     /**
@@ -142,10 +143,12 @@ abstract class Model
      * @access private
      * @return array|null
      */
-    private static function getPrimaryKeys() {
+    private static function getPrimaryKeys()
+    {
         $class = get_called_class();
         $sth = self::conn()->query('SHOW KEYS FROM ' . self::getTable() . " WHERE Key_name = 'PRIMARY'");
         $result = $sth->fetchAll();
+    }
 
     /**
      * Method getLastId
@@ -281,7 +284,7 @@ abstract class Model
                     $array[] = get_object_vars($r);
                 }
                 return $array;
-            }    
+            }
         }
     }
 
@@ -341,7 +344,7 @@ abstract class Model
             self::$result = $instance;
         }
 
-        if(!is_null(self::$conn) && !self::$conn->inTransaction()) {
+        if (!is_null(self::$conn) && !self::$conn->inTransaction()) {
             self::$conn = null;
         }
 
@@ -429,9 +432,9 @@ abstract class Model
 
         foreach ($vars as $k => $v) {
             if (!is_null($v) || $v != '') {
-            	if(in_array($k,$primaryKeys)) {
-                	$conn->where(Utils::camelToSnakeCase($k), $v);
-            	}
+                if (in_array($k, $primaryKeys)) {
+                    $conn->where(Utils::camelToSnakeCase($k), $v);
+                }
             }
         }
 
@@ -457,7 +460,7 @@ abstract class Model
         $varsDB = array();
 
         foreach ($vars as $key => $val) {
-            if (($r->hasProperty($key) && isset($val)) && !in_array(Utils::camelToSnakeCase($key),$primaryKeys)) {
+            if (($r->hasProperty($key) && isset($val)) && !in_array(Utils::camelToSnakeCase($key), $primaryKeys)) {
                 $varsDB[Utils::camelToSnakeCase($key)] = $val;
             }
         }
@@ -469,7 +472,7 @@ abstract class Model
             foreach ($primaryKeys as $primary) {
                 if (!is_null($primary)) {
                     $snake = lcfirst(Utils::snakeToCamelCase($primary));
-                    $conn->where($primary,'=',$vars[$snake]);
+                    $conn->where($primary, '=', $vars[$snake]);
                 }
             }
         }
@@ -495,7 +498,7 @@ abstract class Model
 
         self::$result = $conn->select();
 
-	if(!is_null(self::$conn) && !$conn->inTransaction()) {
+        if (!is_null(self::$conn) && !$conn->inTransaction()) {
             self::$conn = null;
         }
 

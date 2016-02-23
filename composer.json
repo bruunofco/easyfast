@@ -9,7 +9,7 @@
             "email": "brunofco_b2@yahoo.com.br"
         }
     ],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "keywords": 
         [
             "php", 

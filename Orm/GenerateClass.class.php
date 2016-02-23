@@ -91,7 +91,7 @@ trait GenerateClass
      * @access public
      * @throws EasyFastException
      */
-    public function setDir ($dir)
+    public function setDir($dir)
     {
         if (!file_exists($dir)) {
             if (!mkdir($dir, 0775, true)) {
@@ -107,7 +107,7 @@ trait GenerateClass
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @param string $xml
      */
-    public function setXmlFile ($xml)
+    public function setXmlFile($xml)
     {
         $this->schema = new MXML();
         $this->schema->load($xml);
@@ -119,7 +119,7 @@ trait GenerateClass
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @param string $xml
      */
-    public function setSchema ($xml)
+    public function setSchema($xml)
     {
         $this->schema = new MXML();
         $this->schema->loadXML($xml);
@@ -130,9 +130,9 @@ trait GenerateClass
      * Cria estrutura das traits conforme arquivo Schema XML e armazena fisicamente
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      */
-    public function createTraits ()
+    public function createTraits()
     {
-        $dir = $this->dir.'/Traits';
+        $dir = $this->dir . '/Traits';
         if (!file_exists($dir)) {
             if (!mkdir($dir, 0775, true)) {
                 throw new EasyFastException('Não foi possível criar o diretório: "' . $dir . '"');
@@ -145,11 +145,11 @@ trait GenerateClass
 
             $this->methodsGeters = null;
             $this->methodsSeters = null;
-            $this->propertys     = null;
-            $uses                = null;
-            $this->lazyLoad      = null;
-            $this->foreignTable  = [];
-            $this->nameClass     = Utils::snakeToCamelCase($table->getAttribute('name'));
+            $this->propertys = null;
+            $uses = null;
+            $this->lazyLoad = null;
+            $this->foreignTable = [];
+            $this->nameClass = Utils::snakeToCamelCase($table->getAttribute('name'));
 
             if ($table->hasChildNodes()) {
 
@@ -157,9 +157,9 @@ trait GenerateClass
 
                     if ($columns->tagName == 'column') {
 
-                        $columnName  = $columns->getAttribute('name');
+                        $columnName = $columns->getAttribute('name');
                         $columnValue = $columns->getAttribute('valueDefault');
-                        $property    = lcfirst(Utils::snakeToCamelCase($columnName));
+                        $property = lcfirst(Utils::snakeToCamelCase($columnName));
 
                         if (!empty($columnValue)) {
                             $property = "{$property} = '{$columnValue}'";
@@ -240,7 +240,7 @@ trait GenerateClass
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
      */
-    public function createClass ()
+    public function createClass()
     {
         $dir = $this->dir;
         if (!file_exists($dir)) {
@@ -253,7 +253,7 @@ trait GenerateClass
 
         foreach ($this->schema->getTag('table') as $table) {
 
-            $this->nameClass = Utils::snakeToCamelCase($table->getAttribute('name'));
+            $this->nameClass = Utils::snakeToCamelCase($table->getAttribute('name')) . 'Model';
 
             if (!file_exists("{$this->dir}/{$this->nameClass}.class.php")) {
                 $file = new \SplFileObject("{$this->dir}/{$this->nameClass}.class.php", 'w');
@@ -267,13 +267,13 @@ trait GenerateClass
      * Method methodSet
      * Gera método Seter
      * @author Bruno Oliveira <bruno@salluzweb.com.br
-     * @param string $columnName;
+     * @param string $columnName ;
      */
-    private function methodSet ($columnName)
+    private function methodSet($columnName)
     {
         $name = Utils::snakeToCamelCase($columnName);
 
-        $v  = "\t/**";
+        $v = "\t/**";
         $v .= "\n\t * Method set{$name}";
         $v .= "\n\t * Atribui valor para propriedade " . lcfirst($name);
         $v .= "\n\t */";
@@ -297,15 +297,15 @@ trait GenerateClass
      * @param string $table
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      */
-    private function methodSetFt ($property, $propLocal, $ft, $ftPhpName = null, $table)
+    private function methodSetFt($property, $propLocal, $ft, $ftPhpName = null, $table)
     {
-        $ftName    = empty($ftPhpName) ? $ft : $ftPhpName;
-        $ftName    = Utils::snakeToCamelCase($ftName);
-        $ft        = Utils::snakeToCamelCase($ft);
+        $ftName = empty($ftPhpName) ? $ft : $ftPhpName;
+        $ftName = Utils::snakeToCamelCase($ftName);
+        $ft = Utils::snakeToCamelCase($ft);
         $propLocal = Utils::snakeToCamelCase($propLocal);
-        $property  = Utils::snakeToCamelCase($property);
+        $property = Utils::snakeToCamelCase($property);
 
-        $v  = "\t/**";
+        $v = "\t/**";
         $v .= "\n\t * Method set$ftName";
         $v .= "\n\t * Atribui valor para a propriedade " . lcfirst($property);
         $v .= "\n\t */";
@@ -332,14 +332,14 @@ trait GenerateClass
      * @param string $table
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      */
-    private function methodSetChild ($property, $propLocal, $ft, $ftPhpName = null, $table)
+    private function methodSetChild($property, $propLocal, $ft, $ftPhpName = null, $table)
     {
-        $ftName    = empty($ftPhpName) ? $ft : $ftPhpName;
-        $ftName    = Utils::snakeToCamelCase($ftName);
+        $ftName = empty($ftPhpName) ? $ft : $ftPhpName;
+        $ftName = Utils::snakeToCamelCase($ftName);
         $propLocal = Utils::snakeToCamelCase($propLocal);
-        $property  = Utils::snakeToCamelCase($property);
+        $property = Utils::snakeToCamelCase($property);
 
-        $v  = "\t/**";
+        $v = "\t/**";
         $v .= "\n\t * Method set$ftName";
         $v .= "\n\t * Atribui valor para a propriedade " . lcfirst($property);
         $v .= "\n\t * @return {$table}";
@@ -362,13 +362,13 @@ trait GenerateClass
      * Method methodGet
      * Gera método geters
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
-     * @param string $columnName;
+     * @param string $columnName ;
      */
-    private function methodGet ($columnName)
+    private function methodGet($columnName)
     {
         $name = Utils::snakeToCamelCase($columnName);
 
-        $v  = "\t/**";
+        $v = "\t/**";
         $v .= "\n\t * Method get{$name}";
         $v .= "\n\t * Obtêm o valor para propriedade " . lcfirst($name);
         $v .= "\n\t */";
@@ -386,15 +386,15 @@ trait GenerateClass
      * Gera método geters para foreign table
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      */
-    private function methodGetFt ($property, $ft, $ftPhpName = null, $class)
+    private function methodGetFt($property, $ft, $ftPhpName = null, $class)
     {
-        $ftName   = empty($ftPhpName) ? $ft : $ftPhpName;
-        $ftName   = Utils::snakeToCamelCase($ftName);
-        $ft       = Utils::snakeToCamelCase($ft);
+        $ftName = empty($ftPhpName) ? $ft : $ftPhpName;
+        $ftName = Utils::snakeToCamelCase($ftName);
+        $ft = Utils::snakeToCamelCase($ft);
         $propertyclass = lcfirst($ft);
         $property = lcfirst(Utils::snakeToCamelCase($property));
 
-        $v  = "\t/**";
+        $v = "\t/**";
         $v .= "\n\t * Method get{$ftName}";
         $v .= "\n\t * Obtêm o objeto {$propertyclass}";
         $v .= "\n\t */";
@@ -421,13 +421,13 @@ trait GenerateClass
      * @param $class
      * @param $property
      */
-    private function methodGetChild ($propertyBd, $ft, $ftPhpName = null, $class, $property)
+    private function methodGetChild($propertyBd, $ft, $ftPhpName = null, $class, $property)
     {
-        $ftName   = empty($ftPhpName) ? $ft : $ftPhpName;
-        $ftName   = Utils::snakeToCamelCase($ftName);
+        $ftName = empty($ftPhpName) ? $ft : $ftPhpName;
+        $ftName = Utils::snakeToCamelCase($ftName);
         $property = ucfirst(Utils::snakeToCamelCase($property));
 
-        $v  = "\t/**";
+        $v = "\t/**";
         $v .= "\n\t * Method get{$ftName}";
         $v .= "\n\t */";
         $v .= "\n\tpublic function get{$ftName}(QueryObject \$where = null, \$limit = 1)";
@@ -466,9 +466,9 @@ trait GenerateClass
      * @return string
      * @param string $use declara uso de classes no contexto da trait
      */
-    private function structureTrait ($use = null)
+    private function structureTrait($use = null)
     {
-        $v  = "<?php";
+        $v = "<?php";
         $v .= "\n/** Generation by EasyFast Framework **/";
         $v .= "\nnamespace {$this->namespace};\n\n";
 
@@ -497,9 +497,9 @@ trait GenerateClass
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @return string
      */
-    private function structureClass ()
+    private function structureClass()
     {
-        $v  = "<?php";
+        $v = "<?php";
         $v .= "\n/** Generation by EasyFast Framework - " . date('Y-m-d H:i:s') . "**/";
         $v .= "\nnamespace {$this->namespace};";
         $v .= "\n\nuse EasyFast\\Mvc\\Model;";
