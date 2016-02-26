@@ -27,11 +27,37 @@ use EasyFast\Exceptions\DBException;
  */
 trait Select
 {
+    /**
+     * Columns
+     * @var
+     */
     private $col;
-    private $order;
+
+    /**
+     * OrderBy
+     * @var array
+     */
+    private $order = array();
+
+    /**
+     * GroupBy
+     * @var array
+     */
+    private $group = array();
+
+    /**
+     * @var
+     */
     private $limit;
+
+    /**
+     * @var
+     */
     private $join;
-    private $leftJoin;
+
+    /**
+     * @var
+     */
     private $sth;
 
     /**
@@ -45,7 +71,7 @@ trait Select
      * @param string $column2 Second column to compare
      * @return Connection
      */
-    public function join ($table, $column1, $operator, $column2)
+    public function join($table, $column1, $operator, $column2)
     {
         $this->join[] = "JOIN $table ON $column1 $operator $column2";
         return $this;
@@ -58,9 +84,9 @@ trait Select
      * @access private
      * @return string|null
      */
-    private function getJoin ()
+    private function getJoin()
     {
-        if(isset($this->join)) {
+        if (isset($this->join)) {
             return implode(' ', array_values($this->join)) . "\n";
         }
         return null;
@@ -77,27 +103,11 @@ trait Select
      * @param string $column2 Second column to compare
      * @return Connection
      */
-    public function leftJoin ($table, $column1, $operator, $column2)
+    public function leftJoin($table, $column1, $operator, $column2)
     {
-        $this->leftJoin[] = "LEFT JOIN $table ON $column1 $operator $column2";
+        $this->join[] = "LEFT JOIN $table ON $column1 $operator $column2";
         return $this;
     }
-
-    /**
-     * Method getLeftJoin
-     * Get the created LEFT JOIN
-     * @author Bruno Oliveira <bruno@salluzweb.com.br>
-     * @access private
-     * @return string|null
-     */
-    private function getLeftJoin ()
-    {
-        if (isset($this->leftJoin)) {
-            return implode(' ', array_values($this->leftJoin)) . "\n";
-        }
-        return null;
-    }
-
 
     /**
      * Method limit
@@ -107,7 +117,7 @@ trait Select
      * @param int $limit
      * @return Connection
      */
-    public function limit ($limit)
+    public function limit($limit)
     {
         $this->limit = $limit;
         return $this;
@@ -120,7 +130,7 @@ trait Select
      * @access private
      * @return string|null
      */
-    private function getLimit ()
+    private function getLimit()
     {
         if (isset($this->limit)) {
             return "LIMIT $this->limit";
@@ -154,12 +164,21 @@ trait Select
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
      * @param string $column Colunm name
-     * @param string $val 
+     * @param string $val
      * @return Connection
      */
-    public function orderBy ($column, $val)
+    public function orderBy($column, $val)
     {
         $this->order[$column] = $val;
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function orderByRand()
+    {
+        $this->order = 'RAND()';
         return $this;
     }
 
@@ -170,10 +189,12 @@ trait Select
      * @access private
      * @return string
      */
-    private function getOrderBy ()
+    private function getOrderBy()
     {
         $order = 'ORDER BY ';
-        if (isset($this->order)) {
+        if (isset($this->order) && $this->order == 'RAND()') {
+            $order .= $this->order . ', ';
+        } elseif (is_array($this->order)) {
             foreach ($this->order as $key => $value) {
                 $order .= $key . ' ' . strtoupper($value) . ', ';
             }
@@ -183,13 +204,47 @@ trait Select
     }
 
     /**
+     * GroupBy
+     * Add a GROUP BY to the SQL script
+     * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     * @access public
+     * @param string $column Colunm name
+     * @return Connection
+     */
+    public function groupBy($column)
+    {
+        $this->group[] = $column;
+        return $this;
+    }
+
+    /**
+     * Get Group By
+     * Get the created GROUP BY
+     * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     * @access private
+     * @return string
+     */
+    private function getGroupBy()
+    {
+        $group = 'GROUP BY ';
+        if (isset($this->group)) {
+            foreach ($this->group as $value) {
+                $group .= $value . ', ';
+            }
+        }
+
+        return substr($group, 0, strripos(trim($group), ',')) . "\n";
+    }
+
+
+    /**
      * Method select
      * Create and execute SELECT using PDO
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
      * @return mixed
      */
-    public function select ()
+    public function select()
     {
         try {
             $cols = is_array($this->col) ? implode(', ', array_values($this->col)) : '*';
@@ -197,18 +252,18 @@ trait Select
             $this->setQuery("SELECT $cols FROM " .
                 $this->getTable() .
                 $this->getJoin() .
-                $this->getLeftJoin() .
                 $this->getWhere() .
                 $this->getOrderBy() .
+                $this->getGroupBy() .
                 $this->getLimit());
 
 
             $this->sth = $this->prepare("SELECT $cols FROM " .
                 $this->getTable() .
                 $this->getJoin() .
-                $this->getLeftJoin() .
                 $this->getWhere() .
                 $this->getOrderBy() .
+                $this->getGroupBy() .
                 $this->getLimit());
 
             if (is_array($this->getPrepareVals())) {
@@ -224,7 +279,7 @@ trait Select
 
             return $this->sth->fetchAll();
         } catch (PDOException $e) {
-            throw new DBException($e->getMessage(), (int) $e->getCode(), $this->getQuery());
+            throw new DBException($e->getMessage(), (int)$e->getCode(), $this->getQuery());
         }
     }
 
@@ -235,7 +290,7 @@ trait Select
      * @access public
      * @return string
      */
-    public function rowCount () 
+    public function rowCount()
     {
         return $this->sth->rowCount();
     }
