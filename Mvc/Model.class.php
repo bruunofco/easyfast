@@ -95,7 +95,7 @@ abstract class Model
      */
     public static function conn ($dataBase = null)
     {
-        if (empty(self::$conn)) {
+        if (empty(self::$conn) || is_null(self::$conn->conn->getAttribute(PDO::ATTR_CONNECTION_STATUS))) {
             self::$conn = new Connection($dataBase);
         }
 
