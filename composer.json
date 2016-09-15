@@ -28,5 +28,6 @@
     },
     "autoload": {
         "files": ["App.class.php"]
-    }
+    },
+    "minimum-stability": "dev"
 }
