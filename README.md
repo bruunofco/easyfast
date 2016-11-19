@@ -35,7 +35,7 @@ To install EasyFast PHP Framework with composer you simply need to create a comp
 ```json
 {
     "require": {
-        "bruunofco/easyfast": "dev-master"
+        "bruunofco/easyfast": "easyfast-2"
     }
 }
 ```
