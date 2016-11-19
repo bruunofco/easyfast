@@ -58,9 +58,13 @@ abstract class Model
         $conn->cleanQuery();
         $conn->table(self::getTable());
 
-        if (!is_null($param1) && is_null($param2)) {
-            $conn->where(self::getPrimaryKey($conn), $param1);
-        } elseif (!is_null($param1) && !is_null($param2)) {
+        if(is_array($param1)) {
+            foreach ($param1 as $key => $value) {
+                $conn->where($key, $value);
+            }
+        } else if (!is_null($param1) && is_null($param2)) {
+            $conn->where(self::getPrimaryKey(), $param1);
+        } else if (!is_null($param1) && !is_null($param2)) {
             $conn->where($param1, $param2);
         }
 
