@@ -63,7 +63,7 @@ abstract class Model
                 $conn->where($key, $value);
             }
         } else if (!is_null($param1) && is_null($param2)) {
-            $conn->where(self::getPrimaryKey(), $param1);
+            $conn->where(self::getPrimaryKeys()[0], $param1);
         } else if (!is_null($param1) && !is_null($param2)) {
             $conn->where($param1, $param2);
         }
@@ -78,7 +78,7 @@ abstract class Model
                     $this->$methodProp($val);
                 }
             } else {
-                throw new EasyFastException('Não existe nenhum registro em \'' . self::getTable() . '\' com \'' . self::getPrimaryKey($conn) . '\' = \'' . $param1 . '\'');
+                throw new EasyFastException('Não existe nenhum registro em \'' . self::getTable() . '\' com (\'' . implode(self::getPrimaryKeys(),",") . '\') = \'' . is_array($param1) ? implode($param1, ",") : $param1 . '\')');
             }
 
             self::$result = $this;
@@ -128,21 +128,6 @@ abstract class Model
     }
 
     /**
-     * Method getPrimaryKey
-     * Obtêm a nome da propriedade que é chave primária
-     * @author Bruno Oliveira <bruno@salluzweb.com.br>
-     * @access private
-     * @return string
-     */
-    private static function getPrimaryKey()
-    {
-        $class = get_called_class();
-        $sth = self::conn()->query('SHOW KEYS FROM ' . self::getTable() . " WHERE Key_name = 'PRIMARY'");
-        $result = $sth->fetch();
-        return isset($result->Column_name) ? $result->Column_name : null;
-    }
-
-    /**
      * Method getPrimaryKeys
      * get the primary key in a vector (useful in composite keys)
      * @author Hiago Souza <hiago@sparkweb.com.br>
@@ -151,7 +136,6 @@ abstract class Model
      */
     private static function getPrimaryKeys()
     {
-        $class = get_called_class();
         $sth = self::conn()->query('SHOW KEYS FROM ' . self::getTable() . " WHERE Key_name = 'PRIMARY'");
         $result = $sth->fetchAll();
 
@@ -175,9 +159,14 @@ abstract class Model
     public static function getLastId()
     {
         $conn = self::conn();
-        $conn->col("max(" . self::getPrimaryKey() . ") as id");
-        $conn->table(self::getTable());
-        return $conn->select();
+        $pks = self::getPrimaryKeys();
+        if(count($pks) == 1) {
+            $conn->col("max(" . $pks[0] . ") as id");
+            $conn->table(self::getTable());
+            return $conn->select();
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -301,6 +290,8 @@ abstract class Model
                 return $array;
             }
         }
+
+        return null;
     }
 
     /**
@@ -321,7 +312,19 @@ abstract class Model
 
         // Quando a busca for feita por chave primária
         if (!empty($pk)) {
-            $conn->where(self::getPrimaryKey($conn), $pk);
+            if(is_array($pk)) {
+                $pks = self::getPrimaryKeys();
+                if(count($pks) > 1) {
+                    foreach ($pk as $key => $value) {
+                        $conn->where($key, $value);
+                    }
+                }
+            } else {
+                $pks = self::getPrimaryKeys();
+                if(count($pks) == 1) {
+                    $conn->where(self::getPrimaryKeys()[0], $pk);
+                }
+            }
 
             $result = $conn->select();
 
@@ -334,7 +337,7 @@ abstract class Model
                     $instance->$methodProp($val);
                 }
             } else {
-                throw new EasyFastException('Não existe nenhum registro em \'' . self::getTable() . '\' com \'' . self::getPrimaryKey($conn) . '\' = \'' . $pk . '\'');
+                throw new EasyFastException('Não existe nenhum registro em \'' . self::getTable() . '\' com (\'' . implode(self::getPrimaryKeys(),",") . '\') = \'' . is_array($pk) ? implode($pk, ",") : $pk . '\')');
             }
 
             self::$result = $instance;
@@ -425,11 +428,15 @@ abstract class Model
         $conn = self::conn();
         $conn->table($this->getTable());
 
-        $pk = $this->getPrimaryKey();
-        $this->$pk = $conn->insert($varsDB);
-        $var = lcfirst(Utils::snakeToCamelCase($pk));
+        $pk = $this->getPrimaryKeys();
+        if(count($pk) == 1) {
+            $this->$pk = $conn->insert($varsDB);
+            $var = lcfirst(Utils::snakeToCamelCase($pk));
 
-        return $this->$var;
+            return $this->$var;
+        } else {
+            return null;
+        }
     }
 
     /**
