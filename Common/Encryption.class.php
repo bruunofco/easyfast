@@ -1,7 +1,5 @@
 <?php
 /*
- * Copyright 2015 Bruno de Oliveira Francisco <bruno@salluzweb.com.br>
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -68,9 +66,9 @@ class Encryption
      * @param string $val String a ser codificada
      * @return string
      */
-    public static function generateHash ($val)
+    public function generateHash ($val)
     {
-        return crypt($val, '$' . self::$saltPrefix .'$'. self::$defaultCost . '$' . self::generateSalt() . '$');
+        return crypt($val, '$' . self::$saltPrefix .'$'. self::$defaultCost . '$' . $this->generateSalt() . '$');
     }
 
     /**
@@ -82,7 +80,7 @@ class Encryption
      * @return boolean
      * @throws EasyFastException
      */
-    public static function check ($string, $hash)
+    public function check ($string, $hash)
     {
         if (crypt($string, $hash) === $hash) {
             return true;

@@ -16,6 +16,7 @@
  */
 
 namespace EasyFast\Common;
+
 use EasyFast\Exceptions\EasyFastException;
 
 /**
@@ -27,21 +28,24 @@ class Upload
     private $file;
     private $extension;
     private $fileName;
-    private $mimeType;
 
     /**
      * Method __construct
-     * @param $_FILE $fileTmp $_FILE[]
-     * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     * @param array $fileTmp $_FILE[]
      * @access public
      */
-    public function __construct ($fileTmp)
+    public function __construct($fileTmp)
     {
         $this->file = $fileTmp;
         $this->extension();
     }
 
-    public function resizeImg ($width, $height)
+    /**
+     * @param $width
+     * @param $height
+     * @throws EasyFastException
+     */
+    public function resizeImg($width, $height)
     {
         $width  = intval($width);
         $height = intval($height);
@@ -61,23 +65,23 @@ class Upload
 
         $newImage = imagecreatetruecolor($width, $height);
 
-        switch ($this->mimeType) {
-            case 'image/png':
+        switch ($this->extension) {
+            case 'png':
                 $image = imagecreatefrompng($this->file['tmp_name']);
                 imagecopyresampled($newImage, $image, 0, 0, 0, 0, $width, $height, $sizeImg[0], $sizeImg[1]);
                 imagepng($newImage, $this->file['tmp_name']);
                 break;
-            case 'image/gif':
+            case 'gif':
                 $image = imagecreatefromgif($this->file['tmp_name']);
                 imagecopyresampled($newImage, $image, 0, 0, 0, 0, $width, $height, $sizeImg[0], $sizeImg[1]);
                 imagegif($newImage, $this->file['tmp_name']);
                 break;
-            case 'image/jpeg':
+            case 'jpg':
                 $image = imagecreatefromjpeg($this->file['tmp_name']);
                 imagecopyresampled($newImage, $image, 0, 0, 0, 0, $width, $height, $sizeImg[0], $sizeImg[1]);
                 imagejpeg($newImage, $this->file['tmp_name']);
                 break;
-            case 'image/pjpeg':
+            case 'jpeg':
                 $image = imagecreatefromjpeg($this->file['tmp_name']);
                 imagecopyresampled($newImage, $image, 0, 0, 0, 0, $width, $height, $sizeImg[0], $sizeImg[1]);
                 imagejpeg($newImage, $this->file['tmp_name']);
@@ -91,10 +95,9 @@ class Upload
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access private
      */
-    private function extension ()
+    private function extension()
     {
         $this->extension = strtolower(end(explode('.', $this->file['name'])));
-        $this->mimeType = image_type_to_mime_type(exif_imagetype($this->file['tmp_name']));
     }
 
     /**
@@ -102,8 +105,9 @@ class Upload
      * Move o arquivo para o novo diretório e atribui um nome ao arquivo
      * @param string $dir
      * @param null|string $name
+     * @return string
      */
-    public function save ($dir, $name = null)
+    public function save($dir, $name = null)
     {
         if (is_null($name)) {
             $this->fileName = md5(uniqid(rand(), true)) . '.' . $this->extension;
@@ -116,7 +120,7 @@ class Upload
         }
 
         if (!is_dir($dir)) {
-            mkdir($dir, 0755, true);
+            mkdir($dir, 0755);
         }
 
         move_uploaded_file($this->file['tmp_name'], $dir . $this->fileName);

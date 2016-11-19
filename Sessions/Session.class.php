@@ -36,11 +36,20 @@ class Session
     public function __construct ()
     {
         try {
-            if (session_status() != PHP_SESSION_ACTIVE) {
-                ob_start();
-                session_start();
-            }
+            $this->start();
         } catch (EasyFastException $e) {}
+    }
+
+    /**
+     * start
+     * Start sesssion
+     */
+    public static function start()
+    {
+        if (session_status() != PHP_SESSION_ACTIVE) {
+            ob_start();
+            session_start();
+        }
     }
 
     /**
@@ -49,8 +58,9 @@ class Session
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @param string $var
      * @param $value
+     * @param bool|null $serialize
      */
-    public static function set ($var, $value, $serialize = true)
+    public static function set ($var, $value, $serialize = false)
     {
         self::sessionStatus();
         if ($serialize) {
@@ -68,10 +78,11 @@ class Session
      * @param string|null $var
      * @param bool|null $unserialize
      * @throws EasyFastException
-     * @return string|array
+     * @return string|array|object
      */
-    public static function get ($var = null, $unserialize = true)
+    public static function get ($var = null, $unserialize = false)
     {
+        self::start();
         self::sessionStatus();
         if (isset($_SESSION[$var])) {
             if ($unserialize) {

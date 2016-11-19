@@ -1,8 +1,6 @@
 <?php
 namespace EasyFast\Http;
 
-use EasyFast\Common\Utils;
-
 /**
  * Class WebSocket
  *
@@ -84,6 +82,7 @@ abstract class WebSocket
 
     /**
      * onMessage
+     *
      * @param $client
      * @param $message
      * @return mixed
@@ -92,6 +91,7 @@ abstract class WebSocket
 
     /**
      * onClose
+     *
      * @param $client
      * @return mixed
      */
@@ -228,7 +228,7 @@ abstract class WebSocket
     public function sendMessage($message, $client = null, $mask = true)
     {
         if ($mask) {
-            $dataMessage = Utils::jsonEncode($message);
+            $dataMessage = json_encode($message);
             if (json_last_error() == JSON_ERROR_NONE) {
                 $message = $dataMessage;
             }
@@ -265,17 +265,5 @@ abstract class WebSocket
     {
         $this->clientDisconnect($socket);
         socket_close($socket);
-    }
-
-    /**
-     * Get Client
-     *
-     * @param $socket
-     * @return mixed
-     */
-    protected function getClient($socket)
-    {
-        $key = array_search($socket, $this->clients);
-        return $this->clients[$key];
     }
 }
