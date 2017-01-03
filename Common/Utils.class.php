@@ -378,9 +378,9 @@ trait Utils
             $isObj = is_object($array[$nKey]);
             if (is_array($array[$nKey]) || is_object($array[$nKey])) {
                 if ($isObj) {
-                    $out[$nKey] = (object)$this->convertKeysToCamelCase($value);
+                    $out[$nKey] = (object)self::convertKeysToCamelCase($value);
                 } else {
-                    $out[$nKey] = $this->convertKeysToCamelCase($value);
+                    $out[$nKey] = self::convertKeysToCamelCase($value);
                 }
             } else {
                 $out[$nKey] = $value;
