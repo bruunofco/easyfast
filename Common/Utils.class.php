@@ -335,4 +335,30 @@ trait Utils
         }
         return $obj;
     }
+    
+
+    /**
+     * Convert keys to camel case
+     * @param $xs array|object
+     * @return array|object
+     */
+    public static function convertKeysToCamelCase($xs)
+    {
+        $out = array();
+        foreach ($xs as $key => $value) {
+            $array = (array)$xs;
+            $nKey = lcfirst(implode('', array_map('ucfirst', explode('_', $key))));
+            $isObj = is_object($array[$nKey]);
+            if (is_array($array[$nKey]) || is_object($array[$nKey])) {
+                if ($isObj) {
+                    $out[$nKey] = (object)$this->convertKeysToCamelCase($value);
+                } else {
+                    $out[$nKey] = $this->convertKeysToCamelCase($value);
+                }
+            } else {
+                $out[$nKey] = $value;
+            }
+        }
+        return $out;
+    }
 }
