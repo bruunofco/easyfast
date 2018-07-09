@@ -1,0 +1,26 @@
+[Main]
+name => index, url => index, action => index, request => GET, restful => true
+name => test, url => teste/main, action => restful, request => GET, restful => true,
+name => notfound, url => 404, action => notfound, httpStatus => 404
+
+[Cliente]
+url => cliente/index, action => index, request => GET, restful => true
+url => cliente/editar/:id, action => editar, request => GET
+
+[ClienteCompras]
+url => cliente/index, action => index, request => GET, restful => true
+url => cliente/editar/:id, action => editar, request => GET
+
+[Produtos]
+url => produtos/index, action => index, request => GET
+url => produtos/editar/:id, action => editar, request => PUT
+url => produtos/inserir, action => editar, request => POST
+
+[Funcionarios]
+url => functionarios/index, action => index, request => GET
+url => functionarios/editar/:id, action => editar, request => PUT
+url => functionarios/inserir, action => editar, request => POST
+
+[Mobile\Login]
+url => mobile/login/editar/:id, action => editar, request => PUT
+url => mobile/login/inserir, action => editar, request => POST

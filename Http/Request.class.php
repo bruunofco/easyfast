@@ -38,7 +38,7 @@ class Request
      * @param string $url
      * @access public
      */
-    public function __construct ($url)
+    public function __construct($url)
     {
         $this->url = $url;
         $this->header = array();
@@ -51,7 +51,7 @@ class Request
      * @access public
      * @return string
      */
-    public function getResponseToObject ()
+    public function getResponseToObject()
     {
         if (is_array($this->content)) {
             return json_decode(json_encode($this->content), FALSE);
@@ -70,7 +70,7 @@ class Request
      * @access public
      * @return string
      */
-    public function getTime ()
+    public function getTime()
     {
         return $this->time->format('%s');
     }
@@ -79,30 +79,32 @@ class Request
      * Method getResponseHeader
      * Retorna o ResponseHeader
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     * @param $object = false
      * @return array
      */
-    public function getResponseHeader ()
+    public function getResponseHeader($object = false)
     {
-        return $this->responseHeader;
+        $header = $this->parseHeaders($this->responseHeader);
+        return $object ? (object)$header : $header;
     }
-    
+
     /**
      * Method getHeader
      * Return header content by parameter
      * @author Hiago Souza <hiago@sparkweb.com.br>
      * @return String
      * @param $name
-     * 
+     *
      */
-    public function getHeader( $name ) 
+    public function getHeader($name)
     {
-        foreach($this->responseHeader as $headerline) {
-            $check = explode(":",$headerline);
-            if(strtolower($check[0]) == strtolower($name)) {
+        foreach ($this->responseHeader as $headerline) {
+            $check = explode(":", $headerline);
+            if (strtolower($check[0]) == strtolower($name)) {
                 return trim($check[1]);
             }
         }
-        
+
         return null;
     }
 
@@ -112,7 +114,7 @@ class Request
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @return array
      */
-    public function getResponseCode ()
+    public function getResponseCode()
     {
         if (is_array($this->responseHeader)) {
             $this->responseCode = explode(' ', $this->responseHeader[0], 3);
@@ -120,7 +122,7 @@ class Request
         } else {
             $this->responseCode = $this->responseHeader;
         }
-        
+
         return $this->responseCode;
     }
 
@@ -132,7 +134,7 @@ class Request
      * @param string $value
      * @return void
      */
-    public function setHeader ($key, $value)
+    public function setHeader($key, $value)
     {
         $this->header[$key] = $value;
     }
@@ -144,7 +146,7 @@ class Request
      * @param string $seconds
      * @return void
      */
-    public function setTimeout ($seconds)
+    public function setTimeout($seconds)
     {
         $this->header['timeout'] = $seconds;
     }
@@ -158,16 +160,16 @@ class Request
      * @param string $method
      * @return object
      */
-    public function exec ($method, $content = null, $header = array())
+    public function exec($method, $content = null, $header = array())
     {
         $timeInit = new DateTime();
         $this->method = $method;
         $httpHeader['header'] = null;
-        
+
         if (is_array($this->header) && is_array($header)) {
-            $header = array_merge($this->header, $header);       
+            $header = array_merge($this->header, $header);
         }
-        
+
         if (!is_null($header)) {
             foreach ($header as $key => $value) {
                 $httpHeader['header'] .= "$key: $value \r\n";
@@ -184,12 +186,30 @@ class Request
         $headerContext = stream_context_create(array('http' => $httpHeader));
         $this->content = @file_get_contents($this->url, false, $headerContext);
         $this->responseHeader = @$http_response_header;
-        
+
         $timeFinal = new DateTime();
         $this->time = $timeInit->diff($timeFinal);
-    
-        
 
         return $this->content;
+    }
+
+    /**
+     * @param $headers
+     * @return array
+     */
+    private function parseHeaders($headers)
+    {
+        $head = array();
+        foreach ($headers as $k => $v) {
+            $t = explode(':', $v, 2);
+            if (isset($t[1]))
+                $head[trim($t[0])] = trim($t[1]);
+            else {
+                $head[] = $v;
+                if (preg_match("#HTTP/[0-9\.]+\s+([0-9]+)#", $v, $out))
+                    $head['reponse_code'] = intval($out[1]);
+            }
+        }
+        return $head;
     }
 }

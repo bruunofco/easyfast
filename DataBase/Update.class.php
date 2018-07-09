@@ -52,7 +52,7 @@ trait Update
         } else {
             $sql = 'UPDATE ' . $this->getTable() . ' SET ';
             foreach ($this->columnValue as $key => $value) {
-                $sql .= $key . ' = ' . $value . ', ';
+                $sql .=  '`' . $key . '` = ' . $value . ', ';
             }
             $sql  = substr($sql, 0, strripos($sql, ', '));
             $sql .= ' ' . $this->getWhere();

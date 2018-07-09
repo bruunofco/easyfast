@@ -25,7 +25,7 @@ namespace EasyFast\DataBase;
  */
 trait WHERE
 {
-    private $where;
+    public $where;
     private $wherePrepare;
     private $vals;
 
@@ -42,6 +42,8 @@ trait WHERE
      */
     public function where ($column, $operator, $value = null, $opLogic = Connection::_AND)
     {
+        $column = '`'.$column.'`'; //tratando para colunas com nomes de constantes exemplo coluna default
+
         if (is_null($value)) {
             if (is_null($value)) {
                 $value = $operator;
@@ -107,8 +109,7 @@ trait WHERE
             $value = $operator;
             $operator = '=';
         }
-
-//        $value = addslashes($value);
+        
         $this->wherePrepare .= "{$column} {$operator} ? {$opLogic}";
         $this->vals[] = $value;
 

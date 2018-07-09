@@ -51,8 +51,8 @@ trait Insert
                     $this->insert();
                 }
             } else {
-                $sql = 'INSERT INTO ' . $this->getTable() . '(';
-                $sql .= implode(', ', array_keys($this->columnValue)) . ')';
+                $sql = 'INSERT INTO ' . $this->getTable() . '(`';
+                $sql .= implode('`, `', array_keys($this->columnValue)) . '`)';
                 $sql .= ' VALUES (' . implode(', ', array_values($this->columnValue)) . ')';
 
                 $this->setQuery($sql);

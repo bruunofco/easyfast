@@ -42,7 +42,7 @@ class MXML extends DOMDocument
      * @param string $version
      * @param string $encoding
      */
-    public function __construct ($version = null, $encoding = null)
+    public function __construct($version = null, $encoding = null)
     {
         libxml_use_internal_errors(true);
         $this->preserveWhiteSpace = false;
@@ -56,7 +56,7 @@ class MXML extends DOMDocument
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @return Array
      */
-    public function getErrors ()
+    public function getErrors()
     {
         return libxml_get_errors();
     }
@@ -71,7 +71,7 @@ class MXML extends DOMDocument
      * @return void
      * @throws EasyFastException
      */
-    public function load ($dirXml, $option = null, $checkXml = false)
+    public function load($dirXml, $option = null, $checkXml = false)
     {
         if (!file_exists($dirXml)) {
             throw new EasyFastException("File \"$dirXml\"not found.");
@@ -79,7 +79,7 @@ class MXML extends DOMDocument
 
         $this->preserveWhiteSpace = false;
         parent::load($dirXml, $option);
-		parent::xinclude();
+        parent::xinclude();
         if (!parent::validate() && $checkXml) {
             throw new EasyFastException('Invalid XML File.');
         }
@@ -94,7 +94,7 @@ class MXML extends DOMDocument
      * @return void
      * @throws EasyFastException
      */
-    public function loadXML ($stringXml, $option = null)
+    public function loadXML($stringXml, $option = null)
     {
         $this->preserveWhiteSpace = false;
         parent::loadXML($stringXml, $option);
@@ -111,7 +111,7 @@ class MXML extends DOMDocument
      * @param String $tag Nome da Tag
      * @return boolean
      */
-    public function checkExistTag ($tag)
+    public function checkExistTag($tag)
     {
         if ($this->getElementsByTagName($tag)->length == 0) {
             return false;
@@ -124,9 +124,9 @@ class MXML extends DOMDocument
      * Verifica existencia da tag, caso exista retorna tag
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @param String $tagName Nome da tag
-     * @return DomElement
+     * @return DOMElement
      */
-    public function getTag ($tagName)
+    public function getTag($tagName)
     {
         if ($this->checkExistTag($tagName)) {
 
@@ -135,9 +135,9 @@ class MXML extends DOMDocument
                 for ($i = 0; $i <= $this->getElementsByTagName($tagName)->length - 1; $i++) {
                     $return["item_$i"] = $this->getElementsByTagName($tagName)->item($i);
                 }
-                return (object) $return;
+                return (object)$return;
             }
-            return (object) $this->getElementsByTagName($tagName)->item(0);
+            return (object)$this->getElementsByTagName($tagName)->item(0);
         }
         return false;
     }
@@ -149,7 +149,7 @@ class MXML extends DOMDocument
      * @param String $tagName Nome da tag
      * @return String|Object retorna string caso encontre apenas uma tag e objeto quanto encontra mais de uma.
      */
-    public function getTagValue ($tagName)
+    public function getTagValue($tagName)
     {
         if ($this->checkExistTag($tagName)) {
 
@@ -158,7 +158,7 @@ class MXML extends DOMDocument
                 for ($i = 0; $i <= $this->getElementsByTagName($tagName)->length - 1; $i++) {
                     $return["item_$i"] = trim($this->getElementsByTagName($tagName)->item($i)->nodeValue);
                 }
-                return (object) $return;
+                return (object)$return;
             }
             //return (object) array('item_0' => trim($this->getElementsByTagName($tagName)->item(0)->nodeValue));
             return $this->getElementsByTagName($tagName)->item(0)->nodeValue;
@@ -175,7 +175,7 @@ class MXML extends DOMDocument
      * @return String|Object quando encontrado apenas uma tag|quando encontrado mais de uma tag
      * @throws EasyFastException
      */
-    public function getTagAttr ($tagName, $attr)
+    public function getTagAttr($tagName, $attr)
     {
         if ($this->checkExistTag($tagName)) {
             $return = array();
@@ -190,7 +190,7 @@ class MXML extends DOMDocument
                 if ($i == 0) {
                     throw new EasyFastException("Attribute \"$attr\" not found in Tag \"$tagName\"");
                 }
-                return (object) $return;
+                return (object)$return;
             } else {
                 if (!$this->getTag($tagName)->hasAttribute($attr)) {
                     throw new EasyFastException("Attribute \"$attr\" not found in Tag \"$tagName\"");
@@ -210,7 +210,7 @@ class MXML extends DOMDocument
      * @param String $value
      * @return DOMDocument
      */
-    public function createAttribute ($attr, $value = null)
+    public function createAttribute($attr, $value = null)
     {
         $xml = parent::createAttribute($attr);
         if (!is_null($value)) {
@@ -224,7 +224,7 @@ class MXML extends DOMDocument
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @return DOMDocument
      */
-    public function createElement ($name, $value = null)
+    public function createElement($name, $value = null)
     {
         return parent::createElement($name, $value);
     }
@@ -240,7 +240,7 @@ class MXML extends DOMDocument
      * @return DOMXPath
      * @throws EasyFastException
      */
-    public function query ($query, $context = null, $namespace = null, $prefix = 'ns')
+    public function query($query, $context = null, $namespace = null, $prefix = 'ns')
     {
         $find = new DOMXPath($this);
 
@@ -253,4 +253,26 @@ class MXML extends DOMDocument
         return $return;
     }
 
+    /**
+     * @param DOMElement $element
+     * @return string
+     */
+    public static function elementToXml(DOMElement $element)
+    {
+        $newdoc = new \DOMDocument('1.0', 'utf-8');
+        $cloned = $element->cloneNode(true);
+        $newdoc->appendChild($newdoc->importNode($cloned, true));
+        return $newdoc->saveXML();
+    }
+
+    /**
+     * @param DOMElement $element
+     * @param string $namespace
+     * @return mixed
+     */
+    public static function elementToJson(DOMElement $element, $namespace = null)
+    {
+        $obj = simplexml_load_string(self::elementToXml($xml));
+        return json_encode($obj);
+    }
 }

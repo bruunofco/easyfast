@@ -41,7 +41,7 @@ class View extends SmartyBC
      */
     public function __construct ()
     {
-        $dirTpl = isset($this->dirTl) ? $this->dirTpl : App::appDirTpl();
+        $dirTpl = isset($this->dirTpl) ? $this->dirTpl : App::getViewConfig('dirTpl');
 
         parent::__construct();
         $this->template_dir     = $dirTpl . '';
@@ -56,7 +56,7 @@ class View extends SmartyBC
         $this->compile_check = true;
         $this->debugging = false;
 
-        $this->assign('appConfig', App::getConfig());
+        $this->assign('appConfig', array_merge_recursive(App::getViewConfig(), App::getAppConfig()));
     }
 
 

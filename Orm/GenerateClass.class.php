@@ -27,75 +27,75 @@ use EasyFast\Exceptions\EasyFastException;
 
 /**
  * Class GenerateClass
- * Reads the XML Schema and create classes and traits
+ * Faz a leitura do Schema XML e cria as classes e traits
  * @package EasyFast\ORM
  * @author Bruno Oliveira <bruno@salluzweb.com.br>
  */
 trait GenerateClass
 {
     /**
-     * @var MXML Stores the database schema
+     * @var MXML Armagena o schema do banco de dados
      */
     private $schema;
 
     /**
-     * @var array Stores the foreign tables
+     * @var array Armagena as tabelas estrangeira
      */
     private $foreignTable;
 
     /**
-     * @var string Stores the class name
+     * @var string Armagena o nome da classe
      */
     private $nameClass;
 
     /**
-     * @var Stores the namespace
+     * @var Armagena o namespace
      */
     private $namespace;
 
     /**
-     * @var Stores setters methods of the current class
+     * @var Armagena os metódos seters da classe atual
      */
     private $methodsSeters;
 
     /**
-     * @var Stores getters methods of the current class
+     * @var Armagena os metódos geters da classe atual
      */
     private $methodsGeters;
 
     /**
-     * @var Stores the properties of the current class
+     * @var Armagena as propriedades da classe atual
      */
     private $propertys;
 
     /**
-     * @var Stores the structure of the current class
+     * @var Armagena a estrutura da classe atual
      */
     private $structureClass;
 
     /**
-     * @var string Stores the main directory where the classes will be recorded
+     * @var string Armagena o diretorio principal onde serão gravada as classes
      */
     private $dir = 'Model';
 
     /**
-     * @var bool Tells whether the foreign key field is LazyLoad or not
+     * @var bool Informa se o campo de chave estrangeira é lazyLoad ou não
      */
     private $lazyLoad;
 
     /**
      * Method setDir
-     * Arrow directory where they are stored classes
+     * Seta diretorio onde serão armagernado as classes
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
-     * @param string $dir Directory where they are stored classes
+     * @param string $dir Diretorio onde serão armazenada as classes
      * @access public
      * @throws EasyFastException
      */
-    public function setDir ($dir)
+    public function setDir($dir)
     {
         if (!file_exists($dir)) {
             if (!mkdir($dir, 0775, true)) {
-                throw new EasyFastException('Could not create the directory: "' . $dir . '"');
+                throw new EasyFastException('Não foi possível criar o diretório: "' . $dir . '"');
             }
         }
         $this->dir = $dir;
@@ -103,11 +103,11 @@ trait GenerateClass
 
     /**
      * Method setXmlFile
-     * Sets the physical XML file containing the schema
+     * Seta o arquivo XML fisico contendo o schema
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @param string $xml
      */
-    public function setXmlFile ($xml)
+    public function setXmlFile($xml)
     {
         $this->schema = new MXML();
         $this->schema->load($xml);
@@ -115,11 +115,11 @@ trait GenerateClass
 
     /**
      * Method setSchema
-     * Arrow containing the XML database schema
+     * Seta XML contendo o schema do banco de dados
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @param string $xml
      */
-    public function setSchema ($xml)
+    public function setSchema($xml)
     {
         $this->schema = new MXML();
         $this->schema->loadXML($xml);
@@ -127,15 +127,15 @@ trait GenerateClass
 
     /**
      * Method createTraits
-     * Create traits of structure as XML Schema file and physically store
+     * Cria estrutura das traits conforme arquivo Schema XML e armazena fisicamente
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      */
-    public function createTraits ()
+    public function createTraits()
     {
-        $dir = $this->dir.'/Traits';
+        $dir = $this->dir . '/Traits';
         if (!file_exists($dir)) {
             if (!mkdir($dir, 0775, true)) {
-                throw new EasyFastException('Could not create the directory: "' . $dir . '"');
+                throw new EasyFastException('Não foi possível criar o diretório: "' . $dir . '"');
             }
         }
 
@@ -145,11 +145,11 @@ trait GenerateClass
 
             $this->methodsGeters = null;
             $this->methodsSeters = null;
-            $this->propertys     = null;
-            $uses                = null;
-            $this->lazyLoad      = null;
-            $this->foreignTable  = [];
-            $this->nameClass     = Utils::snakeToCamelCase($table->getAttribute('name'));
+            $this->propertys = null;
+            $uses = null;
+            $this->lazyLoad = null;
+            $this->foreignTable = [];
+            $this->nameClass = Utils::snakeToCamelCase($table->getAttribute('name'));
 
             if ($table->hasChildNodes()) {
 
@@ -157,9 +157,9 @@ trait GenerateClass
 
                     if ($columns->tagName == 'column') {
 
-                        $columnName  = $columns->getAttribute('name');
+                        $columnName = $columns->getAttribute('name');
                         $columnValue = $columns->getAttribute('valueDefault');
-                        $property    = lcfirst(Utils::snakeToCamelCase($columnName));
+                        $property = lcfirst(Utils::snakeToCamelCase($columnName));
 
                         if (!empty($columnValue)) {
                             $property = "{$property} = '{$columnValue}'";
@@ -172,24 +172,45 @@ trait GenerateClass
                     } elseif ($columns->tagName == 'foreign-key') {
                         foreach ($columns->childNodes as $fk) {
 
-                            // Check if there is more than one foreign key to the same table, if any concatenate with the field name
-                            $countOccurrence = $this->schema->query('foreign-key[foreignTable="' . $columns->getAttribute('foreignTable') . '"]', $columns)->length;
-
                             $class = Utils::snakeToCamelCase($columns->getAttribute('foreignTable'));
-                            
-                            if ($countOccurrence > 1) {
-                                $ft = $columns->getAttribute('foreignTable') . ucfirst($fk->getAttribute('local'));
-                            } else {
-                                $ft = $columns->getAttribute('foreignTable');
-                            }
 
+                            $ft = ucfirst($fk->getAttribute('local')) . '_' . $columns->getAttribute('foreignTable');
+
+                            $this->propertys .= "\n\t/**\n";
+                            $this->propertys .= "\t * @var {$class}Model\n";
+                            $this->propertys .= "\t */\n";
+                            $this->propertys .= "\tprivate \$" . lcfirst(Utils::snakeToCamelCase($ft)) . ";\n";
                             $this->methodSetFt($fk->getAttribute('foreign'), $fk->getAttribute('local'), $ft, $columns->getAttribute('phpName'), $class);
                             $this->methodGetFt($fk->getAttribute('local'), $ft, $columns->getAttribute('phpName'), $class);
                             $this->lazyLoad = $fk->getAttribute('lazyLoad');
 
                             if (empty($this->foreignTable[$columns->getAttribute('foreignTable')])) {
                                 $this->foreignTable[$columns->getAttribute('foreignTable')] = $fk->getAttribute('local');
-                                $uses .= "use {$this->dir}\\" . Utils::snakeToCamelCase($columns->getAttribute('foreignTable')) . ";\n";
+                                $uses .= "use {$this->dir}\\" . Utils::snakeToCamelCase($columns->getAttribute('foreignTable')) . "Model;\n";
+                            }
+
+                        }
+                    } elseif ($columns->tagName == 'child') {
+                        foreach ($columns->childNodes as $child) {
+
+                            // Checa se existe mais de uma chave estrangeira para uma mesma tabela, caso exista concatena com o nome do campo
+                            $countOccurrence = $this->schema->query('child[foreignTable="' . $columns->getAttribute('foreignTable') . '"]', $columns)->length;
+
+                            $class = Utils::snakeToCamelCase($columns->getAttribute('foreignTable'));
+
+                            if ($countOccurrence > 1) {
+                                $ft = $columns->getAttribute('foreignTable') . ucfirst($child->getAttribute('local')) . '_M';
+                            } else {
+                                $ft = $columns->getAttribute('foreignTable') . '_M';
+                            }
+
+                            //$this->methodSetChild($child->getAttribute('foreign'), $child->getAttribute('local'), $ft, $columns->getAttribute('phpName'), $class);
+                            //$this->methodGetChild($child->getAttribute('local'), $ft, $columns->getAttribute('phpName'), $class, $child->getAttribute('foreign'));
+                            $this->lazyLoad = $child->getAttribute('lazyLoad');
+
+                            if (empty($this->foreignTable[$columns->getAttribute('foreignTable')])) {
+                                $this->foreignTable[$columns->getAttribute('foreignTable')] = $child->getAttribute('local');
+                                $uses .= "use {$this->dir}\\" . Utils::snakeToCamelCase($columns->getAttribute('foreignTable')) . "Model;\n";
                             }
 
                         }
@@ -198,7 +219,7 @@ trait GenerateClass
             }
 
             try {
-                $file = new \SplFileObject("{$dir}/Trait$this->nameClass.class.php", 'w');
+                $file = new \SplFileObject("{$dir}/Trait".$this->nameClass."Model.class.php", 'w');
                 $file->fwrite($this->structureTrait($uses));
             } catch (RuntimeException $e) {
                 throw new EasyFastException($e->getMessage(), $e->getCode());
@@ -208,16 +229,16 @@ trait GenerateClass
 
     /**
      * Method createClass
-     * Create the class structure as XML Schema file and physically store
+     * Cria estrutura das classes conforme arquivo Schema XML e armazena fisicamente
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @access public
      */
-    public function createClass ()
+    public function createClass()
     {
         $dir = $this->dir;
         if (!file_exists($dir)) {
             if (!mkdir($dir, 0775, true)) {
-                throw new EasyFastException('Could not create the directory: "' . $dir . '"');
+                throw new EasyFastException('Não foi possível criar o diretório: "' . $dir . '"');
             }
         }
 
@@ -225,7 +246,7 @@ trait GenerateClass
 
         foreach ($this->schema->getTag('table') as $table) {
 
-            $this->nameClass = Utils::snakeToCamelCase($table->getAttribute('name'));
+            $this->nameClass = Utils::snakeToCamelCase($table->getAttribute('name')) . 'Model';
 
             if (!file_exists("{$this->dir}/{$this->nameClass}.class.php")) {
                 $file = new \SplFileObject("{$this->dir}/{$this->nameClass}.class.php", 'w');
@@ -239,19 +260,20 @@ trait GenerateClass
      * Method methodSet
      * Gera método Seter
      * @author Bruno Oliveira <bruno@salluzweb.com.br
-     * @param string $columnName;
+     * @param string $columnName ;
      */
-    private function methodSet ($columnName)
+    private function methodSet($columnName)
     {
         $name = Utils::snakeToCamelCase($columnName);
 
-        $v  = "\t/**";
+        $v = "\t/**";
         $v .= "\n\t * Method set{$name}";
-        $v .= "\n\t * Assign value to property " . lcfirst($name);
+        $v .= "\n\t * Atribui valor para propriedade " . lcfirst($name);
         $v .= "\n\t */";
         $v .= "\n\tpublic function set{$name} (\$val)";
         $v .= "\n\t{";
         $v .= "\n\t\t\$this->" . lcfirst($name) . ' = $val;';
+        $v .= "\n\t\treturn \$this;";
         $v .= "\n\t}";
         $v .= "\n\n";
 
@@ -260,30 +282,70 @@ trait GenerateClass
 
     /**
      * Method methodSetFt
-     * Generates setter method for foreign table
-     * @param string $ft Name of the foreign table
-     * @param string $ftPhpName Nickname for the method
+     * Gera método seter para foreign table
+     * @param string $ft Nome da tabela estrangeira
+     * @param string $ftPhpName Apelido para o método
+     * @param string $property
+     * @param string $propLocal
+     * @param string $table
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      */
-    private function methodSetFt ($property, $propLocal, $ft, $ftPhpName = null, $table)
+    private function methodSetFt($property, $propLocal, $ft, $ftPhpName = null, $table)
     {
-        $ftName    = empty($ftPhpName) ? $ft : $ftPhpName;
-        $ftName    = Utils::snakeToCamelCase($ftName);
-        $ft        = Utils::snakeToCamelCase($ft);
+        $ftName = empty($ftPhpName) ? $ft : $ftPhpName;
+        $ftName = Utils::snakeToCamelCase($ftName) . "Model";
+        $table = $table. "Model";
+        $ft = Utils::snakeToCamelCase($ft);
         $propLocal = Utils::snakeToCamelCase($propLocal);
-        $property  = Utils::snakeToCamelCase($property);
+        $property = Utils::snakeToCamelCase($property);
 
-        $v  = "\t/**";
+        $v = "\t/**";
         $v .= "\n\t * Method set$ftName";
-        $v .= "\n\t * Assign value to the property " . lcfirst($property);
+        $v .= "\n\t * Atribui valor para a propriedade " . lcfirst($property);
         $v .= "\n\t */";
         $v .= "\n\tpublic function set$ftName ($table \$val)";
         $v .= "\n\t{";
-        $v .= "\n\t\t\$this->tmpObject{$ftName} = null;";
         $v .= "\n\t\tif (\$val->get$property() == null) " . '{';
         $v .= "\n\t\t\t\$val->save();";
         $v .= "\n\t\t}";
         $v .= "\n\t\t\$this->set$propLocal(\$val->get$property());";
+        $v .= "\n\t\treturn \$this;";
+        $v .= "\n\t}";
+        $v .= "\n\n";
+
+        $this->methodsSeters .= $v;
+    }
+
+    /**
+     * Method methodSetChild
+     * Gera método seter para foreign table
+     * @param string $ft Nome da tabela estrangeira
+     * @param string $ftPhpName Apelido para o método
+     * @param string $property
+     * @param string $propLocal
+     * @param string $table
+     * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     */
+    private function methodSetChild($property, $propLocal, $ft, $ftPhpName = null, $table)
+    {
+        $ftName = empty($ftPhpName) ? $ft : $ftPhpName;
+        $ftName = Utils::snakeToCamelCase($ftName) . "Model";
+        $propLocal = Utils::snakeToCamelCase($propLocal);
+        $property = Utils::snakeToCamelCase($property);
+
+        $v = "\t/**";
+        $v .= "\n\t * Method set$ftName";
+        $v .= "\n\t * Atribui valor para a propriedade " . lcfirst($property);
+        $v .= "\n\t * @return {$table}";
+        $v .= "\n\t */";
+        $v .= "\n\tpublic function set$ftName ($table \$val = null)";
+        $v .= "\n\t{";
+        $v .= "\n\t\tif (!is_null(\$val)) {";
+        $v .= "\n\t\t\t\$val->save();";
+        $v .= "\n\t\t}";
+        $v .= "\n\t\t\$model = new {$table};";
+        $v .= "\n\t\t\$model->set{$propLocal}(\$this->get{$property}());";
+        $v .= "\n\t\treturn \$model;";
         $v .= "\n\t}";
         $v .= "\n\n";
 
@@ -292,15 +354,15 @@ trait GenerateClass
 
     /**
      * Method methodGet
-     * Generate getters methods
+     * Gera método geters
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
-     * @param string $columnName;
+     * @param string $columnName ;
      */
-    private function methodGet ($columnName)
+    private function methodGet($columnName)
     {
         $name = Utils::snakeToCamelCase($columnName);
 
-        $v  = "\t/**";
+        $v = "\t/**";
         $v .= "\n\t * Method get{$name}";
         $v .= "\n\t * Obtêm o valor para propriedade " . lcfirst($name);
         $v .= "\n\t */";
@@ -315,27 +377,77 @@ trait GenerateClass
 
     /**
      * Method methodGetFt
-     * Generate Getters methods to foreign table
+     * Gera método geters para foreign table
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      */
-    private function methodGetFt ($property, $ft, $ftPhpName = null, $class)
+    private function methodGetFt($property, $ft, $ftPhpName = null, $class)
     {
-        $ftName   = empty($ftPhpName) ? $ft : $ftPhpName;
-        $ftName   = Utils::snakeToCamelCase($ftName);
-        $ft       = Utils::snakeToCamelCase($ft);
+        $ftName = empty($ftPhpName) ? $ft : $ftPhpName;
+        $ftName = Utils::snakeToCamelCase($ftName) . "Model";
+        $ft = Utils::snakeToCamelCase($ft);
+        $propertyclass = lcfirst($ft);
         $property = lcfirst(Utils::snakeToCamelCase($property));
 
-        $v  = "\t/**";
+        $v = "\t/**";
         $v .= "\n\t * Method get{$ftName}";
-        $v .= "\n\t * Obtêm o objeto " . lcfirst($ft);
+        $v .= "\n\t * Obtêm o objeto {$propertyclass}";
+        $v .= "\n\t * @return {$class}Model";
         $v .= "\n\t */";
-        $v .= "\n\tprivate \$tmpObject{$ftName} = null;";
         $v .= "\n\tpublic function get{$ftName} ()";
         $v .= "\n\t{";
-        $v .= "\n\t\tif(is_null(\$this->tmpObject{$ftName})) {";
-        $v .= "\n\t\t\t\$this->tmpObject{$ftName} = new {$class}(\$this->$property);";
+        $v .= "\n\t\ttry {";
+        $v .= "\n\t\t\t\$this->{$propertyclass} = new {$class}Model(\$this->$property);";
+        $v .= "\n\t\t} catch (EasyFastException \$e) {";
+        $v .= "\n\t\t\t\$this->{$propertyclass} = new {$class}Model();";
         $v .= "\n\t\t}";
-        $v .= "\n\t\treturn \$this->tmpObject{$ftName};";
+        $v .= "\n\t\treturn \$this->{$propertyclass};";
+        $v .= "\n\t}";
+        $v .= "\n\n";
+
+        $this->methodsGeters .= $v;
+    }
+
+    /**
+     * Method methodGetFt
+     * @author Bruno Oliveira <bruno@salluzweb.com.br>
+     * @param $propertyBd
+     * @param $ft
+     * @param null $ftPhpName
+     * @param $class
+     * @param $property
+     */
+    private function methodGetChild($propertyBd, $ft, $ftPhpName = null, $class, $property)
+    {
+        $ftName = empty($ftPhpName) ? $ft : $ftPhpName;
+        $ftName = Utils::snakeToCamelCase($ftName) . "Model";
+        $property = ucfirst(Utils::snakeToCamelCase($property));
+
+        $v = "\t/**";
+        $v .= "\n\t * Method get{$ftName}";
+        $v .= "\n\t */";
+        $v .= "\n\tpublic function get{$ftName}(QueryObject \$where = null, \$limit = 1)";
+        $v .= "\n\t{";
+        $v .= "\n\t\ttry {";
+        $v .= "\n\t\t\t\$models = new {$class}();";
+        $v .= "\n\t\t\t\$models->where('{$propertyBd}', \$this->get{$property}());";
+        $v .= "\n\t\t\tif (!is_null(\$where)) {";
+        $v .= "\n\t\t\t\tforeach (\$where::getWhere() as \$w) {";
+        $v .= "\n\t\t\t\t\t\$models->where(\$w['column'], \$w['operator'], \$w['value'], \$w['opLogic']);";
+        $v .= "\n\t\t\t\t}";
+        $v .= "\n\t\t\t\t\$where::cleanWhere();";
+        $v .= "\n\t\t\t}";
+        $v .= "\n\t\t\tif (!is_null(\$limit) AND \$limit > 1) {";
+        $v .= "\n\t\t\t\treturn array_slice(\$models->find(), 0, \$limit);";
+        $v .= "\n\t\t\t} elseif (!is_null(\$limit)) {";
+        $v .= "\n\t\t\t\treturn \$models->find()[0];";
+        $v .= "\n\t\t\t}";
+        $v .= "\n\t\t\treturn \$models->find();";
+        $v .= "\n\t\t} catch (EasyFastException \$e) {";
+        $v .= "\n\t\t\tif (!is_null(\$limit) AND \$limit <= 1) {";
+        $v .= "\n\t\t\t\treturn new {$class}();";
+        $v .= "\n\t\t\t}";
+        $v .= "\n\t\t\treturn array();";
+        $v .= "\n\t\t}";
         $v .= "\n\t}";
         $v .= "\n\n";
 
@@ -344,24 +456,26 @@ trait GenerateClass
 
     /**
      * Method structureTrait
-     * Generates the structure of traits
+     * Gera a estrutura das traits
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @return string
-     * @param string $use declare the use of classes in the context of trait
+     * @param string $use declara uso de classes no contexto da trait
      */
-    private function structureTrait ($use = null)
+    private function structureTrait($use = null)
     {
-        $v  = "<?php";
+        $v = "<?php";
         $v .= "\n/** Generation by EasyFast Framework **/";
-        $v .= "\nnamespace {$this->namespace};";
+        $v .= "\nnamespace {$this->namespace};\n\n";
 
-        !is_null($use) ? $v .= "\n\n{$use}" : null;
+        $v .= "use EasyFast\\Exceptions\\EasyFastException;\n";
+        //$v .= "use EasyFast\\Common\\QueryObject;";
+        !is_null($use) ? $v .= "{$use}" : null;
 
         $v .= "\n\n/**";
-        $v .= "\n * Trait {$this->nameClass}";
-        $v .= "\n * They contain methods getters setters";
+        $v .= "\n * Trait {$this->nameClass}Model";
+        $v .= "\n * Contêm métodos geters seters";
         $v .= "\n */";
-        $v .= "\ntrait Trait{$this->nameClass}";
+        $v .= "\ntrait Trait{$this->nameClass}Model";
         $v .= "\n{";
         $v .= "\n$this->propertys";
         $v .= "\n$this->methodsSeters";
@@ -374,19 +488,19 @@ trait GenerateClass
 
     /**
      * Method generateStructureClass
-     * Responsible for creating the structure of the class
+     * Responsável em criar a estrutura da classe
      * @author Bruno Oliveira <bruno@salluzweb.com.br>
      * @return string
      */
-    private function structureClass ()
+    private function structureClass()
     {
-        $v  = "<?php";
+        $v = "<?php";
         $v .= "\n/** Generation by EasyFast Framework - " . date('Y-m-d H:i:s') . "**/";
         $v .= "\nnamespace {$this->namespace};";
         $v .= "\n\nuse EasyFast\\Mvc\\Model;";
         $v .= "\n\n/**";
         $v .= "\n * Class {$this->nameClass}";
-        $v .= "\n * They contain business rules related to this object";
+        $v .= "\n * Contêm regras de négocio relacionado a este objeto";
         $v .= "\n */";
         $v .= "\nclass {$this->nameClass} extends Model";
         $v .= "\n{";

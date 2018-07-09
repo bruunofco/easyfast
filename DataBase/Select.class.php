@@ -17,8 +17,9 @@
 
 namespace EasyFast\DataBase;
 
-use PDOException;
 use EasyFast\Exceptions\DBException;
+use EasyFast\Common\Utils;
+use PDOException;
 
 /**
  * Class Select
@@ -277,7 +278,7 @@ trait Select
 
             $this->cleanWhere();
 
-            return $this->sth->fetchAll();
+            return Utils::convertKeysToCamelCase($this->sth->fetchAll());
         } catch (PDOException $e) {
             throw new DBException($e->getMessage(), (int)$e->getCode(), $this->getQuery());
         }

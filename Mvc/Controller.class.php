@@ -27,6 +27,7 @@ use EasyFast\App;
  */
 abstract class Controller
 {
+    private $rest;
 
     /**
      * Method addRestfulServer
@@ -36,7 +37,7 @@ abstract class Controller
      * @param string $url
      * @param string $methodClass
      */
-    protected function addRestfulServer ($method, $url, $methodClass)
+    protected function rest($method, $url, $methodClass)
     {
         App::getServerRestful()->server($method, $url, array($this, $methodClass));
     }

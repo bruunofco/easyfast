@@ -20,11 +20,11 @@ namespace EasyFast\Exceptions;
 use Exception;
 
 /**
- * Class EasyFastException
+ * Class RouteException
  * @package EasyFast\Class\Exception
  * @author Bruno Oliveira <bruno@salluzweb.com.br>
  */
-class EasyFastException extends Exception
+class RouteException extends Exception
 {
     /**
      * Method __construct

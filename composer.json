@@ -7,6 +7,10 @@
         {
             "name": "bruunofco",
             "email": "brunofco_b2@yahoo.com.br"
+        },
+        {
+            "name": "hiagodotme",
+            "email": "hiasilva@gmail.com"
         }
     ],
     "keywords": 
@@ -24,9 +28,10 @@
             "smarty"
         ],
     "require": {
-        "php": ">=5.5.3" 
+        "php": ">=5.6.4"
     },
     "autoload": {
-        "files": ["App.class.php"]
+        "files": ["App.class.php"],
+        "psr-4": {"EasyFast\\": "vendor/bruunofco/easyfast/"}
     }
 }

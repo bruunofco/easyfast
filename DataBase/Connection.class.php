@@ -61,16 +61,15 @@ class Connection
      */
     public function __construct ($db = null)
     {
-        $configs = App::getDBConfig();
+        $configs = App::getDataBaseConfig();
 
         if (is_null($db)) {
-            $dataBaseMain = App::dbMain();
-            $dataBaseMain = !is_null($dataBaseMain) ? $dataBaseMain : 'Main';
-            $this->open($configs[$dataBaseMain]);
+            $dataBaseMain = 'Main';
+            $this->open($configs->{$dataBaseMain});
         } elseif (is_array($db)) {
             $this->open($db);
         } else {
-            $this->open($configs[$db]);
+            $this->open($configs->{$db});
         }
     }
 
@@ -85,17 +84,17 @@ class Connection
      */
     public function open ($db)
     {
-        if (!is_array($db)) {
+        if (!is_object($db)) {
             throw new DBException('Invalid configuration for Database');
         }
 
         //Set Values
-        $userName   = isset($db['UserName'])    ? $db['UserName']   : null;
-        $password   = isset($db['Password'])    ? $db['Password']   : null;
-        $dbName     = isset($db['DBName'])      ? $db['DBName']     : null;
-        $hostName   = isset($db['HostName'])    ? $db['HostName']   : null;
-        $drive      = isset($db['Drive'])       ? $db['Drive']      : null;
-        $port       = isset($db['Port'])        ? $db['Port']       : null;
+        $userName   = isset($db->UserName)    ? $db->UserName   : null;
+        $password   = isset($db->Password)    ? $db->Password   : null;
+        $dbName     = isset($db->DBName)      ? $db->DBName     : null;
+        $hostName   = isset($db->HostName)    ? $db->HostName   : null;
+        $drive      = isset($db->Drive)       ? $db->Drive      : null;
+        $port       = isset($db->Port)        ? $db->Port       : null;
 
         //Get the correct drive for each database
         switch ($drive) {
@@ -186,7 +185,7 @@ class Connection
     {
         try {
             $this->conn->commit();
-            $this->cleanQuery();
+            $this->conn = null;
         } catch (PDOException $e) {
             throw new DBException($e->getMessage(), $e->getCode());
         }
@@ -203,7 +202,7 @@ class Connection
     {
         try {
             $this->conn->rollback();
-            $this->cleanQuery();
+            $this->conn = null;
         } catch (PDOException $e) {
             throw new DBException($e->getMessage(), $e->getCode());
         }

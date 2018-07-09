@@ -1,0 +1,17 @@
+# Generated with EasyFast PHP Framework
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !favicon.ico$
+  RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+
+#  <Files *.ini>
+#    Order allow,deny
+#    Deny from all
+#  </Files>
+#  <Files *.xml>
+#    Order allow,deny
+#    Deny from all
+#  </Files>
+</IfModule>
