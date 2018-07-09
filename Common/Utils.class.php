@@ -375,15 +375,16 @@ trait Utils
         foreach ($xs as $key => $value) {
             $array = (array)$xs;
             $nKey = lcfirst(implode('', array_map('ucfirst', explode('_', $key))));
-            $isObj = is_object($array[$nKey]);
-            if (is_array($array[$nKey]) || is_object($array[$nKey])) {
+            $keyUse = empty($array[$nKey]) ? $key : $nKey;
+            $isObj = is_object($array[$keyUse]);
+            if (is_array($array[$keyUse]) || is_object($array[$keyUse])) {
                 if ($isObj) {
-                    $out[$nKey] = (object)self::convertKeysToCamelCase($value);
+                    $out[$keyUse] = (object)self::convertKeysToCamelCase($value);
                 } else {
-                    $out[$nKey] = self::convertKeysToCamelCase($value);
+                    $out[$keyUse] = self::convertKeysToCamelCase($value);
                 }
             } else {
-                $out[$nKey] = $value;
+                $out[$keyUse] = $value;
             }
         }
         return $out;
